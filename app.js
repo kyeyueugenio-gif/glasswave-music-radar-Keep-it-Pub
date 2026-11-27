@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MUZIKIGLASS v4 — Instant Music + Working HTTPS Radio + Dual Lyrics + 3-Slide Tray
+   MUZIKIGLASS — Refined Transport Controls, Custom Volume & Fixed Tray Slide
    ========================================================================== */
 
 const EXPRESSIVE_PALETTES = [
@@ -10,7 +10,6 @@ const EXPRESSIVE_PALETTES = [
   { name: "Pearl Crimson", primary: "#fb7185", primaryContainer: "rgba(251, 113, 133, 0.24)", secondary: "#fcd34d", secondaryContainer: "rgba(252, 211, 77, 0.2)", tertiary: "#38bdf8" },
 ];
 
-// Fast batched queries (prevents API throttling)
 const QUERY_PRESETS = {
   trending: { uganda: ["Joshua Baraka", "Azawi Uganda"], global: ["Sabrina Carpenter", "Kendrick Lamar"] },
   ugaflow: { uganda: ["Elijah Kitaka", "Fik Fameica"], global: ["Ayra Starr", "Burna Boy"] },
@@ -19,7 +18,6 @@ const QUERY_PRESETS = {
   hiphop: { uganda: ["Navio", "Gravity Omutujju"], global: ["Kendrick Lamar", "Travis Scott"] },
 };
 
-// Instant-render catalog so music ALWAYS shows immediately
 const INITIAL_CATALOG = [
   {
     id: "ug-1",
@@ -71,7 +69,6 @@ const INITIAL_CATALOG = [
   },
 ];
 
-// Reliable HTTPS Live Radio Stations (work directly on GitHub Pages HTTPS)
 const RELIABLE_RADIO = [
   {
     id: "rad-somafm-groove",
@@ -142,6 +139,10 @@ const state = {
   shuffle: false,
   repeat: false,
   paletteIdx: 0,
+  volume: 0.8,
+  lastVolume: 0.8,
+  isMuted: false,
+  currentSlide: 0,
   syncedLines: [],
   activeLyricIdx: -1,
 };
@@ -154,13 +155,23 @@ const trayCarousel = document.getElementById("tray-carousel");
 const ytModalBackdrop = document.getElementById("yt-modal-backdrop");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const trayPlayBtn = document.getElementById("tray-play-btn");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const trayPrevBtn = document.getElementById("tray-prev-btn");
+const trayNextBtn = document.getElementById("tray-next-btn");
 const seekBar = document.getElementById("seek-bar");
 const traySeekBar = document.getElementById("tray-seek-bar");
-const volumeBar = document.getElementById("volume-bar");
 const visualizer = document.getElementById("visualizer");
 const dockArtWrap = document.getElementById("dock-art-wrap");
 const trayYtIframe = document.getElementById("tray-yt-iframe");
 const trayArt = document.getElementById("tray-art");
+
+// Custom Volume Elements
+const volMuteBtn = document.getElementById("volume-mute-btn");
+const volTrack = document.getElementById("custom-volume-track");
+const volFill = document.getElementById("custom-vol-fill");
+const volThumb = document.getElementById("custom-vol-thumb");
+const volReadout = document.getElementById("volume-readout");
 
 /* ==========================================================================
    1. Helpers: Fetch Timeout, Toast, Lighting & M3 Palette
@@ -215,7 +226,78 @@ document.getElementById("theme-cycle-btn").addEventListener("click", () => {
 });
 
 /* ==========================================================================
-   2. Fast Non-Throttled Music & Radio Fetchers
+   2. Custom Futuristic Volume Bar Wiring
+   ========================================================================== */
+function setVolumeLevel(val, { saveNonZero = true } = {}) {
+  const clamped = Math.max(0, Math.min(1, val));
+  state.volume = clamped;
+  state.isMuted = clamped === 0;
+  if (saveNonZero && clamped > 0) state.lastVolume = clamped;
+
+  audioPlayer.volume = clamped;
+  const pct = Math.round(clamped * 100);
+
+  volFill.style.width = `${pct}%`;
+  volThumb.style.left = `${pct}%`;
+  volReadout.textContent = `${pct}%`;
+  volTrack.setAttribute("aria-valuenow", String(pct));
+
+  // Update dynamic speaker wave SVG states
+  volMuteBtn.classList.toggle("muted", state.isMuted);
+  const wave1 = volMuteBtn.querySelector(".vol-wave-1");
+  const wave2 = volMuteBtn.querySelector(".vol-wave-2");
+  const slash1 = volMuteBtn.querySelector(".vol-slash");
+  const slash2 = volMuteBtn.querySelector(".vol-slash-2");
+
+  wave1.classList.toggle("hidden", state.isMuted);
+  wave2.classList.toggle("hidden", state.isMuted || clamped < 0.48);
+  slash1.classList.toggle("hidden", !state.isMuted);
+  slash2.classList.toggle("hidden", !state.isMuted);
+}
+
+function scrubVolumeFromEvent(e) {
+  const rect = volTrack.getBoundingClientRect();
+  const ratio = (e.clientX - rect.left) / rect.width;
+  setVolumeLevel(ratio);
+}
+
+volTrack.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  volTrack.setPointerCapture(e.pointerId);
+  volTrack.classList.add("dragging");
+  scrubVolumeFromEvent(e);
+});
+
+volTrack.addEventListener("pointermove", (e) => {
+  if (!volTrack.classList.contains("dragging")) return;
+  scrubVolumeFromEvent(e);
+});
+
+const stopVolDrag = () => volTrack.classList.remove("dragging");
+volTrack.addEventListener("pointerup", stopVolDrag);
+volTrack.addEventListener("pointercancel", stopVolDrag);
+
+volTrack.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+    e.preventDefault();
+    setVolumeLevel(state.volume + 0.05);
+  } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+    e.preventDefault();
+    setVolumeLevel(state.volume - 0.05);
+  }
+});
+
+volMuteBtn.addEventListener("click", () => {
+  if (state.isMuted) {
+    setVolumeLevel(state.lastVolume > 0 ? state.lastVolume : 0.8);
+  } else {
+    state.lastVolume = state.volume || 0.8;
+    setVolumeLevel(0, { saveNonZero: false });
+  }
+});
+
+/* ==========================================================================
+   3. Fast Non-Throttled Music & Radio Fetchers
    ========================================================================== */
 async function fetchYouTubeTrending(regionCode, regionTag) {
   const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=${regionCode}&maxResults=10&key=${encodeURIComponent(state.ytApiKey)}`;
@@ -397,7 +479,7 @@ async function loadCharts() {
 }
 
 /* ==========================================================================
-   3. Dual Lyrics Engine (LRCLIB Synced + lyrics.ovh Fallback)
+   4. Dual Lyrics Engine (NEVER hijacks horizontal carousel slide!)
    ========================================================================== */
 function cleanTrackName(name) {
   return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].split("feat")[0].trim();
@@ -424,7 +506,7 @@ async function loadLyricsForTrack(track) {
 
   if (!track || track.isRadio) {
     status.textContent = "Live FM";
-    box.innerHTML = `<p class="lyrics-placeholder">📻 Live FM Radio Broadcast.<br/>Switch to any song to read lyrics!</p>`;
+    box.innerHTML = `<p class="lyrics-placeholder">Live FM broadcast — switch to a music track to view lyrics.</p>`;
     return;
   }
 
@@ -435,7 +517,6 @@ async function loadLyricsForTrack(track) {
   const cleanArtist = cleanTrackName(track.artist);
 
   try {
-    // 1. Try LRCLIB (supports synced timestamps)
     let res = await fetchWithTimeout(`https://lrclib.net/api/get?track_name=${encodeURIComponent(cleanTitle)}&artist_name=${encodeURIComponent(cleanArtist)}`, 4500);
     let data = res.ok ? await res.json() : null;
 
@@ -463,12 +544,11 @@ async function loadLyricsForTrack(track) {
     }
 
     if (data?.plainLyrics) {
-      status.textContent = "Plain";
+      status.textContent = "Lyrics";
       box.innerHTML = `<div class="lyric-plain">${data.plainLyrics}</div>`;
       return;
     }
 
-    // 2. Fallback to lyrics.ovh
     const ovhRes = await fetchWithTimeout(`https://api.lyrics.ovh/v1/${encodeURIComponent(cleanArtist)}/${encodeURIComponent(cleanTitle)}`, 4500);
     if (ovhRes.ok) {
       const ovhData = await ovhRes.json();
@@ -480,7 +560,7 @@ async function loadLyricsForTrack(track) {
     }
 
     status.textContent = "Unavailable";
-    box.innerHTML = `<p class="lyrics-placeholder">Lyrics aren’t indexed yet for "${track.title}".<br/>Tap <strong>↗ YT</strong> at the top to view on YouTube Music.</p>`;
+    box.innerHTML = `<p class="lyrics-placeholder">Lyrics aren’t indexed yet for "${track.title}".</p>`;
   } catch {
     status.textContent = "Offline";
     box.innerHTML = `<p class="lyrics-placeholder">Could not load lyrics right now.</p>`;
@@ -498,15 +578,21 @@ function updateActiveLyric(currentTime) {
   state.activeLyricIdx = active;
 
   const box = document.getElementById("tray-lyrics-box");
-  box.querySelectorAll(".lyric-line").forEach((el, idx) => {
-    const isCurrent = idx === active;
-    el.classList.toggle("active-line", isCurrent);
-    if (isCurrent) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+  const lines = box.querySelectorAll(".lyric-line");
+  lines.forEach((el, idx) => el.classList.toggle("active-line", idx === active));
+
+  // Scroll ONLY vertically inside #tray-lyrics-box and ONLY when Lyrics slide (2) is active!
+  if (active >= 0 && state.currentSlide === 2 && trayBackdrop.classList.contains("open")) {
+    const activeEl = lines[active];
+    if (activeEl) {
+      const targetTop = Math.max(0, activeEl.offsetTop - box.clientHeight / 2 + activeEl.clientHeight / 2);
+      box.scrollTo({ top: targetTop, behavior: "smooth" });
+    }
+  }
 }
 
 /* ==========================================================================
-   4. Filter, Sort & Render Grid
+   5. Filter, Sort & Render Grid
    ========================================================================== */
 function updateLikedCounter() {
   document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length;
@@ -551,6 +637,7 @@ function filterAndRender() {
   }
 
   state.filteredTracks = list;
+  updateTransportAvailability();
   renderSpotlight(list[0]);
   renderGrid(list);
   renderTrayQueue();
@@ -613,8 +700,15 @@ function renderGrid(list) {
 }
 
 /* ==========================================================================
-   5. Playback + Compact 3-Slide Tray (Player -> Up Next -> Lyrics)
+   6. Transport Controls + Compact 3-Slide Tray
    ========================================================================== */
+function updateTransportAvailability() {
+  const hasQueue = state.filteredTracks.length > 0;
+  [prevBtn, nextBtn, trayPrevBtn, trayNextBtn].forEach((btn) => {
+    btn.disabled = !hasQueue;
+  });
+}
+
 function playTrackAtIndex(idx) {
   const track = state.filteredTracks[idx];
   if (!track) return;
@@ -650,18 +744,18 @@ function playTrackAtIndex(idx) {
 
     if (track.previewUrl) {
       audioPlayer.src = track.previewUrl;
-      audioPlayer.volume = Number(volumeBar.value);
+      audioPlayer.volume = state.volume;
       audioPlayer.play()
         .then(() => {
           state.isPlaying = true;
-          document.getElementById("stat-audio").textContent = track.isRadio ? "🔴 Live Radio" : "Playing 30s";
+          document.getElementById("stat-audio").textContent = track.isRadio ? "Live Radio" : "Playing";
           updatePlayerUI();
           renderGrid(state.filteredTracks);
         })
         .catch(() => {
           state.isPlaying = false;
-          document.getElementById("stat-audio").textContent = "Stream Unavailable";
-          showToast("Tap another station or press ▶ again");
+          document.getElementById("stat-audio").textContent = "Unavailable";
+          showToast("Stream unavailable — try another track");
           updatePlayerUI();
         });
     } else {
@@ -689,7 +783,7 @@ audioPlayer.addEventListener("error", () => {
   if (track?.isRadio && state.isPlaying) {
     state.isPlaying = false;
     updatePlayerUI();
-    showToast("This radio stream is offline — try SomaFM or Radio Paradise");
+    showToast("This station is offline — try SomaFM or Radio Paradise");
   }
 });
 
@@ -753,14 +847,18 @@ function renderTrayQueue() {
   listEl.appendChild(frag);
 }
 
-// Slide Navigation (Swipe Left/Right + Top Pills + Swipe Hints)
-function goToTraySlide(slideIndex) {
+function goToTraySlide(slideIndex, { instant = false } = {}) {
+  state.currentSlide = slideIndex;
   const width = trayCarousel.clientWidth;
-  trayCarousel.scrollTo({ left: width * slideIndex, behavior: "smooth" });
+  trayCarousel.scrollTo({
+    left: width * slideIndex,
+    behavior: instant ? "instant" : "smooth",
+  });
   updateTraySlideDots(slideIndex);
 }
 
 function updateTraySlideDots(activeIdx) {
+  state.currentSlide = activeIdx;
   document.querySelectorAll(".tray-dot").forEach((dot) => {
     dot.classList.toggle("active", Number(dot.dataset.slide) === activeIdx);
   });
@@ -772,7 +870,7 @@ trayCarousel.addEventListener("scroll", () => {
   slideScrollTimer = setTimeout(() => {
     const idx = Math.round(trayCarousel.scrollLeft / (trayCarousel.clientWidth || 1));
     updateTraySlideDots(idx);
-  }, 50);
+  }, 60);
 }, { passive: true });
 
 document.querySelectorAll(".tray-dot").forEach((dot) => {
@@ -784,11 +882,11 @@ document.querySelectorAll(".swipe-hint").forEach((hint) => {
 });
 
 function updatePlayerUI() {
-  const icon = state.isPlaying ? "⏸" : "▶";
-  playPauseBtn.textContent = icon;
-  trayPlayBtn.textContent = icon;
+  const label = state.isPlaying ? "Pause" : "Play";
   playPauseBtn.classList.toggle("is-playing", state.isPlaying);
   trayPlayBtn.classList.toggle("is-playing", state.isPlaying);
+  playPauseBtn.setAttribute("aria-label", label);
+  trayPlayBtn.setAttribute("aria-label", label);
   visualizer.classList.toggle("active", state.isPlaying);
   dockArtWrap.classList.toggle("spinning", state.isPlaying);
 }
@@ -824,8 +922,8 @@ function playPrev(e) {
 }
 
 playPauseBtn.addEventListener("click", togglePlayPause);
-document.getElementById("prev-btn").addEventListener("click", playPrev);
-document.getElementById("next-btn").addEventListener("click", playNext);
+prevBtn.addEventListener("click", playPrev);
+nextBtn.addEventListener("click", playNext);
 seekBar.addEventListener("click", (e) => e.stopPropagation());
 playerDock.addEventListener("click", openPickerTray);
 
@@ -834,7 +932,7 @@ function openPickerTray() {
   renderTrayQueue();
   trayBackdrop.classList.add("open");
   trayBackdrop.setAttribute("aria-hidden", "false");
-  goToTraySlide(0);
+  goToTraySlide(0, { instant: true });
 }
 
 function closePickerTray() {
@@ -846,19 +944,19 @@ document.getElementById("tray-close-btn").addEventListener("click", closePickerT
 trayBackdrop.addEventListener("click", (e) => { if (e.target === trayBackdrop) closePickerTray(); });
 
 trayPlayBtn.addEventListener("click", togglePlayPause);
-document.getElementById("tray-next-btn").addEventListener("click", playNext);
-document.getElementById("tray-prev-btn").addEventListener("click", playPrev);
+trayNextBtn.addEventListener("click", playNext);
+trayPrevBtn.addEventListener("click", playPrev);
 
 document.getElementById("tray-shuffle-btn").addEventListener("click", (e) => {
   state.shuffle = !state.shuffle;
-  e.target.classList.toggle("active-toggle", state.shuffle);
-  showToast(state.shuffle ? "Shuffle On 🔀" : "Shuffle Off");
+  e.currentTarget.classList.toggle("active-toggle", state.shuffle);
+  showToast(state.shuffle ? "Shuffle On" : "Shuffle Off");
 });
 
 document.getElementById("tray-repeat-btn").addEventListener("click", (e) => {
   state.repeat = !state.repeat;
-  e.target.classList.toggle("active-toggle", state.repeat);
-  showToast(state.repeat ? "Repeat On 🔁" : "Repeat Off");
+  e.currentTarget.classList.toggle("active-toggle", state.repeat);
+  showToast(state.repeat ? "Repeat On" : "Repeat Off");
 });
 
 audioPlayer.addEventListener("timeupdate", () => {
@@ -892,7 +990,6 @@ function handleSeek(val) {
 }
 seekBar.addEventListener("input", () => handleSeek(seekBar.value));
 traySeekBar.addEventListener("input", () => handleSeek(traySeekBar.value));
-volumeBar.addEventListener("input", () => { audioPlayer.volume = Number(volumeBar.value); });
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
@@ -901,7 +998,7 @@ function formatTime(sec) {
 }
 
 /* ==========================================================================
-   6. Navigation, Radio Switcher & YouTube API Modal
+   7. Navigation, Radio Switcher & YouTube API Modal
    ========================================================================== */
 document.getElementById("yt-api-btn").addEventListener("click", () => {
   document.getElementById("yt-api-key-input").value = state.ytApiKey;
@@ -916,7 +1013,7 @@ document.getElementById("yt-save-btn").addEventListener("click", () => {
   state.ytApiKey = key;
   localStorage.setItem("muzikiglass_yt_key", key);
   ytModalBackdrop.classList.remove("open");
-  showToast("YouTube Music API Connected!");
+  showToast("YouTube Music API Connected");
   loadCharts();
 });
 
@@ -924,7 +1021,7 @@ document.getElementById("yt-clear-btn").addEventListener("click", () => {
   state.ytApiKey = "";
   localStorage.removeItem("muzikiglass_yt_key");
   ytModalBackdrop.classList.remove("open");
-  showToast("Switched back to free latest charts");
+  showToast("Using free sync");
   loadCharts();
 });
 
@@ -966,18 +1063,19 @@ document.getElementById("search-form").addEventListener("submit", (e) => {
 
 document.getElementById("refresh-btn").addEventListener("click", () => {
   if (state.region === "radio") {
-    fetchLiveRadioStations().then(() => showToast("Radio refreshed!"));
+    fetchLiveRadioStations().then(() => showToast("Radio refreshed"));
   } else {
     loadCharts();
   }
 });
 
 /* ==========================================================================
-   Boot — Instant Render First, Then Background Live Sync
+   Boot
    ========================================================================== */
 attachGlassLighting();
 applyPalette(0);
+setVolumeLevel(0.8);
 updateLikedCounter();
-filterAndRender();      // Renders instantly in 0ms!
-loadCharts();           // Updates with fresh charts in background
+filterAndRender();
+loadCharts();
 fetchLiveRadioStations();
