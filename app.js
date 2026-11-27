@@ -1,111 +1,55 @@
 /* ==========================================================================
-   MUZIKIGLASS — Live Global & Ugandan Music Engine
-   
+   MUZIKIGLASS v2 — Latest Ugandan & Global Music + Now-Playing Picker Tray
+   Supports Latest 2024-2026 Drops + Optional YouTube Data API v3 Integration
    ========================================================================== */
 
-// Material 3 Expressive Dynamic Palettes with Tonal Containers
 const EXPRESSIVE_PALETTES = [
-  {
-    name: "Kampala Sunset",
-    primary: "#ff7a45",
-    primaryContainer: "rgba(255, 122, 69, 0.24)",
-    secondary: "#38bdf8",
-    secondaryContainer: "rgba(56, 189, 248, 0.2)",
-    tertiary: "#e879f9",
-  },
-  {
-    name: "Nile Emerald",
-    primary: "#34d399",
-    primaryContainer: "rgba(52, 211, 153, 0.22)",
-    secondary: "#60a5fa",
-    secondaryContainer: "rgba(96, 165, 250, 0.2)",
-    tertiary: "#c084fc",
-  },
-  {
-    name: "Afrobeat Gold",
-    primary: "#fbbf24",
-    primaryContainer: "rgba(251, 191, 36, 0.24)",
-    secondary: "#fb7185",
-    secondaryContainer: "rgba(251, 113, 133, 0.2)",
-    tertiary: "#818cf8",
-  },
-  {
-    name: "Global Neon",
-    primary: "#60a5fa",
-    primaryContainer: "rgba(96, 165, 250, 0.24)",
-    secondary: "#f472b6",
-    secondaryContainer: "rgba(244, 114, 182, 0.2)",
-    tertiary: "#2dd4bf",
-  },
-  {
-    name: "Pearl Crimson",
-    primary: "#fb7185",
-    primaryContainer: "rgba(251, 113, 133, 0.24)",
-    secondary: "#fcd34d",
-    secondaryContainer: "rgba(252, 211, 77, 0.2)",
-    tertiary: "#38bdf8",
-  },
+  { name: "Kampala Sunset", primary: "#ff7a45", primaryContainer: "rgba(255, 122, 69, 0.24)", secondary: "#38bdf8", secondaryContainer: "rgba(56, 189, 248, 0.2)", tertiary: "#e879f9" },
+  { name: "Nile Emerald", primary: "#34d399", primaryContainer: "rgba(52, 211, 153, 0.22)", secondary: "#60a5fa", secondaryContainer: "rgba(96, 165, 250, 0.2)", tertiary: "#c084fc" },
+  { name: "Afrobeat Gold", primary: "#fbbf24", primaryContainer: "rgba(251, 191, 36, 0.24)", secondary: "#fb7185", secondaryContainer: "rgba(251, 113, 133, 0.2)", tertiary: "#818cf8" },
+  { name: "Global Neon", primary: "#60a5fa", primaryContainer: "rgba(96, 165, 250, 0.24)", secondary: "#f472b6", secondaryContainer: "rgba(244, 114, 182, 0.2)", tertiary: "#2dd4bf" },
+  { name: "Pearl Crimson", primary: "#fb7185", primaryContainer: "rgba(251, 113, 133, 0.24)", secondary: "#fcd34d", secondaryContainer: "rgba(252, 211, 77, 0.2)", tertiary: "#38bdf8" },
 ];
 
-// Curated Offline/Fallback Ugandan & Global Hits
+// Fresh 2024–2026 queries (eliminates decade-old classics from dominating top charts)
+const QUERY_PRESETS = {
+  trending: {
+    uganda: ["Joshua Baraka", "Elijah Kitaka", "Azawi", "Mudra Uganda", "Winnie Nwagi", "Lydia Jazmine"],
+    global: ["Kendrick Lamar GNX", "Sabrina Carpenter", "ROSE Bruno Mars", "Tems", "Asake", "Billie Eilish"],
+  },
+  ugaflow: {
+    uganda: ["Joshua Baraka", "Elijah Kitaka", "Fik Fameica", "Azawi", "Vinka", "B2C Uganda"],
+    global: ["Ayra Starr", "Rema", "Wizkid Morayo", "Burna Boy"],
+  },
+  amapiano: {
+    uganda: ["Sheebah", "Spice Diana", "Pallaso"],
+    global: ["Tyla", "Tyler ICU", "Uncle Waffles", "Kabza De Small"],
+  },
+  globalpop: {
+    uganda: ["Joshua Baraka", "Kenneth Mugabi", "Abeeka Band"],
+    global: ["Lady Gaga", "Sabrina Carpenter", "The Weeknd", "Ariana Grande"],
+  },
+  hiphop: {
+    uganda: ["Fik Fameica", "Navio", "Gravity Omutujju", "Feffe Bussi"],
+    global: ["Kendrick Lamar", "Central Cee", "Travis Scott", "Doechii"],
+  },
+};
+
 const FALLBACK_TRACKS = [
   {
-    id: "ug-1",
-    title: "Sitya Loss",
-    artist: "Eddy Kenzo",
-    album: "Sitya Loss",
-    genre: "Ugaflow & Afrobeat",
-    region: "uganda",
-    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/44/0c/a4/440ca4c0-1f62-842b-2cf2-145c3cfcb0b8/artwork.jpg/600x600bb.jpg",
-    previewUrl: "",
-    releaseYear: "2014",
-  },
-  {
-    id: "ug-2",
+    id: "ug-new-1",
     title: "Nana",
     artist: "Joshua Baraka",
     album: "Growing Pains",
-    genre: "Ugaflow & Afrobeat",
+    genre: "Afro-Pop",
     region: "uganda",
     artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b8/96/4d/b8964d1f-152c-25fb-9a3f-9c126925c5d4/197188894965.jpg/600x600bb.jpg",
     previewUrl: "",
-    releaseYear: "2023",
+    releaseDate: "2024-03-01",
+    releaseYear: "2024",
   },
   {
-    id: "ug-3",
-    title: "Party",
-    artist: "Azawi",
-    album: "Sankofa",
-    genre: "Ugaflow & Afrobeat",
-    region: "uganda",
-    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1c/71/23/1c7123c7-b9e2-96d2-7bc6-d19b2fa9d490/196589626516.jpg/600x600bb.jpg",
-    previewUrl: "",
-    releaseYear: "2023",
-  },
-  {
-    id: "gl-1",
-    title: "Water",
-    artist: "Tyla",
-    album: "TYLA",
-    genre: "Amapiano",
-    region: "global",
-    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/aa/52/4d/aa524dff-952e-d77e-00f7-e7d06b5c1a49/196871319959.jpg/600x600bb.jpg",
-    previewUrl: "",
-    releaseYear: "2023",
-  },
-  {
-    id: "gl-2",
-    title: "City Boys",
-    artist: "Burna Boy",
-    album: "I Told Them...",
-    genre: "Afrobeats",
-    region: "global",
-    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/67/40/f4/6740f40f-c7b2-1fa1-cc5f-d0e1a4a217a1/075679678799.jpg/600x600bb.jpg",
-    previewUrl: "",
-    releaseYear: "2023",
-  },
-  {
-    id: "gl-3",
+    id: "gl-new-1",
     title: "Die With A Smile",
     artist: "Lady Gaga & Bruno Mars",
     album: "Single",
@@ -113,94 +57,68 @@ const FALLBACK_TRACKS = [
     region: "global",
     artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/55/82/1155825e-59e3-8c53-efbd-0f1940376d09/24UMGIM84979.rgb.jpg/600x600bb.jpg",
     previewUrl: "",
+    releaseDate: "2024-08-16",
     releaseYear: "2024",
   },
 ];
 
-// Query configurations for Live iTunes Music Search API
-const QUERY_PRESETS = {
-  trending: {
-    uganda: ["Eddy Kenzo", "Joshua Baraka", "Azawi Uganda", "Sheebah Karungi", "Alien Skin Uganda", "Winnie Nwagi"],
-    global: ["Burna Boy", "Tyla", "Sabrina Carpenter", "Kendrick Lamar", "Billie Eilish", "Wizkid"],
-  },
-  ugaflow: {
-    uganda: ["Eddy Kenzo", "Bebe Cool", "Jose Chameleone", "Fik Fameica", "Azawi", "Vinka Uganda"],
-    global: ["Rema", "Asake", "Ayra Starr", "Burna Boy"],
-  },
-  amapiano: {
-    uganda: ["Sheebah", "Pallaso", "Spice Diana"],
-    global: ["Tyla", "Kabza De Small", "Uncle Waffles", "Tyler ICU"],
-  },
-  globalpop: {
-    uganda: ["Joshua Baraka", "Elijah Kitaka", "Kenneth Mugabi"],
-    global: ["Taylor Swift", "The Weeknd", "Ariana Grande", "SZA"],
-  },
-  hiphop: {
-    uganda: ["Navio Uganda", "GNL Zamba", "Fik Fameica", "Gravity Omutujju"],
-    global: ["Kendrick Lamar", "Drake", "Travis Scott", "J. Cole"],
-  },
-};
-
 const state = {
   tracks: [],
   filteredTracks: [],
+  likedMap: JSON.parse(localStorage.getItem("muzikiglass_liked") || "{}"),
+  ytApiKey: localStorage.getItem("muzikiglass_yt_key") || "",
   region: "all",
   genre: "trending",
-  sortBy: "rank",
+  sortBy: "newest",
   searchQuery: "",
   currentIndex: -1,
   isPlaying: false,
+  shuffle: false,
+  repeat: false,
   paletteIdx: 0,
 };
 
+// DOM Refs
 const tracksGrid = document.getElementById("tracks-grid");
 const audioPlayer = document.getElementById("audio-player");
+const playerDock = document.getElementById("player-dock");
+const trayBackdrop = document.getElementById("tray-backdrop");
+const ytModalBackdrop = document.getElementById("yt-modal-backdrop");
 const playPauseBtn = document.getElementById("play-pause-btn");
-const spotlightPlayBtn = document.getElementById("spotlight-play-btn");
+const trayPlayBtn = document.getElementById("tray-play-btn");
 const seekBar = document.getElementById("seek-bar");
+const traySeekBar = document.getElementById("tray-seek-bar");
 const volumeBar = document.getElementById("volume-bar");
 const visualizer = document.getElementById("visualizer");
 const dockArtWrap = document.getElementById("dock-art-wrap");
+const trayYtIframe = document.getElementById("tray-yt-iframe");
+const trayArt = document.getElementById("tray-art");
 
 /* ==========================================================================
-   1. Apple Liquid Glass Specular Pointer + Gentle Optical Aura
+   1. Glass Lighting + Material Expressive Palette + Toast
    ========================================================================== */
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 2400);
+}
+
 function attachGlassLighting() {
   document.addEventListener("pointermove", (e) => {
-    const cards = document.querySelectorAll(".liquid-card");
-    cards.forEach((card) => {
+    document.querySelectorAll(".liquid-card").forEach((card) => {
       const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty("--mouse-x", `${x}%`);
-      card.style.setProperty("--mouse-y", `${y}%`);
+      card.style.setProperty("--mouse-x", `${((e.clientX - rect.left) / rect.width) * 100}%`);
+      card.style.setProperty("--mouse-y", `${((e.clientY - rect.top) / rect.height) * 100}%`);
     });
   });
 
-  const refractionRange = document.getElementById("refraction-range");
-  const dispText = document.getElementById("disp-text");
-  const dispSurface = document.getElementById("disp-surface");
-  refractionRange.addEventListener("input", (e) => {
-    const val = Number(e.target.value);
-    dispText.setAttribute("scale", val);
-    dispSurface.setAttribute("scale", val * 1.2);
+  document.getElementById("refraction-range").addEventListener("input", (e) => {
+    document.getElementById("disp-text").setAttribute("scale", Number(e.target.value));
   });
-
-  let phase = 0;
-  function animateRefraction() {
-    phase += 0.015;
-    const turbText = document.getElementById("turb-text");
-    const freqX = (0.008 + Math.sin(phase) * 0.002).toFixed(4);
-    const freqY = (0.015 + Math.cos(phase * 0.8) * 0.003).toFixed(4);
-    turbText.setAttribute("baseFrequency", `${freqX} ${freqY}`);
-    requestAnimationFrame(animateRefraction);
-  }
-  requestAnimationFrame(animateRefraction);
 }
 
-/* ==========================================================================
-   2. Material 3 Expressive Tonal Palette Engine
-   ========================================================================== */
 function applyPalette(index) {
   state.paletteIdx = index % EXPRESSIVE_PALETTES.length;
   const p = EXPRESSIVE_PALETTES[state.paletteIdx];
@@ -215,54 +133,123 @@ function applyPalette(index) {
 
 document.getElementById("theme-cycle-btn").addEventListener("click", () => {
   applyPalette(state.paletteIdx + 1);
+  showToast(`Palette: ${EXPRESSIVE_PALETTES[state.paletteIdx].name}`);
 });
 
 /* ==========================================================================
-   3. Live Music Fetcher (iTunes Search API for Ugandan & Global Music)
+   2. Music Fetchers: YouTube Data API v3 (if key saved) + Latest iTunes Sync
    ========================================================================== */
-async function fetchArtistSongs(term, regionTag) {
-  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=4`;
+async function fetchYouTubeTrending(regionCode, regionTag) {
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=${regionCode}&maxResults=12&key=${encodeURIComponent(state.ytApiKey)}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error("API fetch failed");
+  if (!res.ok) throw new Error("YouTube API error");
   const data = await res.json();
 
-  return (data.results || []).map((item) => ({
+  return (data.items || []).map((v) => ({
+    id: `yt-${v.id}`,
+    ytVideoId: v.id,
+    title: v.snippet.title,
+    artist: v.snippet.channelTitle.replace(" - Topic", ""),
+    album: "YouTube Music Trending",
+    genre: "YouTube Live",
+    region: regionTag,
+    artwork: v.snippet.thumbnails?.high?.url || v.snippet.thumbnails?.medium?.url || "",
+    previewUrl: "",
+    releaseDate: v.snippet.publishedAt || "2025-01-01",
+    releaseYear: (v.snippet.publishedAt || "2025").slice(0, 4),
+  }));
+}
+
+async function fetchYouTubeSearch(query, regionTag) {
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&order=date&maxResults=8&q=${encodeURIComponent(query)}&key=${encodeURIComponent(state.ytApiKey)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("YouTube Search API error");
+  const data = await res.json();
+
+  return (data.items || []).map((v) => ({
+    id: `yt-${v.id.videoId}`,
+    ytVideoId: v.id.videoId,
+    title: v.snippet.title,
+    artist: v.snippet.channelTitle.replace(" - Topic", ""),
+    album: "YouTube Music",
+    genre: "YT Latest",
+    region: regionTag,
+    artwork: v.snippet.thumbnails?.high?.url || v.snippet.thumbnails?.medium?.url || "",
+    previewUrl: "",
+    releaseDate: v.snippet.publishedAt || "2025-01-01",
+    releaseYear: (v.snippet.publishedAt || "2025").slice(0, 4),
+  }));
+}
+
+async function fetchItunesLatest(term, regionTag) {
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=10`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("iTunes fetch failed");
+  const data = await res.json();
+
+  // Sort results by newest releaseDate and keep the top 3 newest per query
+  const sorted = (data.results || [])
+    .filter((item) => item.trackName && item.artworkUrl100)
+    .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0))
+    .slice(0, 3);
+
+  return sorted.map((item) => ({
     id: String(item.trackId),
     title: item.trackName,
     artist: item.artistName,
     album: item.collectionName || "Single",
     genre: item.primaryGenreName || "Music",
     region: regionTag,
-    artwork: (item.artworkUrl100 || "").replace("100x100bb", "600x600bb"),
+    artwork: item.artworkUrl100.replace("100x100bb", "600x600bb"),
     previewUrl: item.previewUrl || "",
+    releaseDate: item.releaseDate || "2024-01-01",
     releaseYear: item.releaseDate ? item.releaseDate.slice(0, 4) : "2025",
   }));
 }
 
 async function loadCharts() {
   const statusEl = document.getElementById("live-status-text");
-  statusEl.textContent = "SYNCING LIVE UGANDA & GLOBAL CHARTS...";
-  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">Loading live audio waves from Kampala &amp; Global charts...</div>`;
+  const sourceEl = document.getElementById("stat-source");
+  statusEl.textContent = "SYNCING LATEST UGANDA & GLOBAL MUSIC...";
+  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">Fetching latest 2025/2026 waves...</div>`;
 
   try {
     let fetched = [];
 
-    if (state.searchQuery.trim()) {
-      const q = state.searchQuery.trim();
-      const [ugRes, glRes] = await Promise.all([
-        fetchArtistSongs(`${q} Uganda`, "uganda"),
-        fetchArtistSongs(q, "global"),
-      ]);
-      fetched = [...ugRes, ...glRes];
+    if (state.ytApiKey) {
+      sourceEl.textContent = "YouTube Music API";
+      if (state.searchQuery.trim()) {
+        const q = state.searchQuery.trim();
+        const [ugYt, glYt] = await Promise.all([
+          fetchYouTubeSearch(`${q} Uganda`, "uganda"),
+          fetchYouTubeSearch(q, "global"),
+        ]);
+        fetched = [...ugYt, ...glYt];
+      } else {
+        const [ugYt, glYt] = await Promise.all([
+          fetchYouTubeTrending("UG", "uganda"),
+          fetchYouTubeTrending("US", "global"),
+        ]);
+        fetched = [...ugYt, ...glYt];
+      }
     } else {
-      const preset = QUERY_PRESETS[state.genre] || QUERY_PRESETS.trending;
-      const ugPromises = preset.uganda.map((artist) => fetchArtistSongs(artist, "uganda"));
-      const glPromises = preset.global.map((artist) => fetchArtistSongs(artist, "global"));
-      const results = await Promise.allSettled([...ugPromises, ...glPromises]);
-
-      results.forEach((r) => {
-        if (r.status === "fulfilled") fetched.push(...r.value);
-      });
+      sourceEl.textContent = "Latest Releases";
+      if (state.searchQuery.trim()) {
+        const q = state.searchQuery.trim();
+        const [ugRes, glRes] = await Promise.all([
+          fetchItunesLatest(`${q} Uganda`, "uganda"),
+          fetchItunesLatest(q, "global"),
+        ]);
+        fetched = [...ugRes, ...glRes];
+      } else {
+        const preset = QUERY_PRESETS[state.genre] || QUERY_PRESETS.trending;
+        const ugPromises = preset.uganda.map((a) => fetchItunesLatest(a, "uganda"));
+        const glPromises = preset.global.map((a) => fetchItunesLatest(a, "global"));
+        const results = await Promise.allSettled([...ugPromises, ...glPromises]);
+        results.forEach((r) => {
+          if (r.status === "fulfilled") fetched.push(...r.value);
+        });
+      }
     }
 
     const seen = new Set();
@@ -282,54 +269,82 @@ async function loadCharts() {
     }
 
     state.tracks = interleaved.length ? interleaved : FALLBACK_TRACKS;
-    statusEl.textContent = "LIVE CHARTS • KAMPALA TO THE WORLD";
+    statusEl.textContent = state.ytApiKey
+      ? "YOUTUBE MUSIC LIVE • UGANDA & GLOBAL"
+      : "LATEST RELEASES • KAMPALA TO THE WORLD";
   } catch (err) {
-    console.warn("Falling back to local music catalog:", err);
+    console.warn("API fallback triggered:", err);
+    if (state.ytApiKey) {
+      showToast("YouTube API key invalid or quota exceeded — using free charts");
+    }
     state.tracks = FALLBACK_TRACKS;
     statusEl.textContent = "OFFLINE PULSE • CURATED CATALOG";
   }
 
+  updateLikedCounter();
   filterAndRender();
 }
 
 /* ==========================================================================
-   4. Filter, Sort & Render UI
+   3. Filter, Sort, Liked Songs & Render
    ========================================================================== */
-function filterAndRender() {
-  let list = [...state.tracks];
+function updateLikedCounter() {
+  document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length;
+}
 
-  if (state.region !== "all") {
+function toggleLike(track, e) {
+  if (e) e.stopPropagation();
+  if (state.likedMap[track.id]) {
+    delete state.likedMap[track.id];
+    showToast("Removed from Liked");
+  } else {
+    state.likedMap[track.id] = track;
+    showToast("Saved to Liked ♥");
+  }
+  localStorage.setItem("muzikiglass_liked", JSON.stringify(state.likedMap));
+  updateLikedCounter();
+  syncTrayDetails();
+  filterAndRender();
+}
+
+function filterAndRender() {
+  let list = state.region === "liked"
+    ? Object.values(state.likedMap)
+    : [...state.tracks];
+
+  if (state.region === "uganda" || state.region === "global") {
     list = list.filter((t) => t.region === state.region);
   }
 
-  if (state.sortBy === "title") {
+  if (state.sortBy === "newest") {
+    list.sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0));
+  } else if (state.sortBy === "title") {
     list.sort((a, b) => a.title.localeCompare(b.title));
   } else if (state.sortBy === "artist") {
     list.sort((a, b) => a.artist.localeCompare(b.artist));
   }
 
   state.filteredTracks = list;
-  document.getElementById("stat-count").textContent = list.length;
   renderSpotlight(list[0]);
   renderGrid(list);
+  renderTrayQueue();
 }
 
 function renderSpotlight(track) {
   if (!track) return;
   document.getElementById("spotlight-img").src = track.artwork;
   document.getElementById("spotlight-title").textContent = track.title;
-  document.getElementById("spotlight-artist").textContent = `${track.artist} • ${track.album}`;
+  document.getElementById("spotlight-artist").textContent = `${track.artist} • ${track.releaseYear}`;
   document.getElementById("spotlight-region").textContent =
     track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
-
-  spotlightPlayBtn.onclick = () => playTrackAtIndex(0);
+  document.getElementById("spotlight-play-btn").onclick = () => playTrackAtIndex(0);
 }
 
 function renderGrid(list) {
   tracksGrid.innerHTML = "";
 
   if (!list.length) {
-    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">No tracks matched your filter. Try switching to "All Waves".</div>`;
+    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">No tracks found here yet. Tap ♥ on any song to save it!</div>`;
     return;
   }
 
@@ -339,15 +354,19 @@ function renderGrid(list) {
       state.currentIndex >= 0 &&
       state.filteredTracks[state.currentIndex]?.id === track.id &&
       state.isPlaying;
+    const isLiked = Boolean(state.likedMap[track.id]);
 
     card.className = `track-card liquid-card${isPlayingThis ? " playing" : ""}`;
-    card.style.animationDelay = `${Math.min(idx * 30, 320)}ms`;
+    card.style.animationDelay = `${Math.min(idx * 25, 280)}ms`;
 
     card.innerHTML = `
       <div class="track-cover-wrap">
         <img src="${track.artwork}" alt="${track.title}" loading="lazy" />
         <span class="rank-badge">#${idx + 1}</span>
         <span class="region-badge">${track.region === "uganda" ? "🇺🇬 UG" : "🌍 GLB"}</span>
+        <button class="card-like-btn ${isLiked ? "liked" : ""}" aria-label="Like ${track.title}">
+          ${isLiked ? "♥" : "♡"}
+        </button>
         <button class="card-play-fab" aria-label="Play ${track.title}">
           ${isPlayingThis ? "⏸" : "▶"}
         </button>
@@ -360,19 +379,20 @@ function renderGrid(list) {
       </div>
     `;
 
+    card.querySelector(".card-like-btn").addEventListener("click", (e) => toggleLike(track, e));
     card.addEventListener("click", () => playTrackAtIndex(idx));
     tracksGrid.appendChild(card);
   });
 }
 
 /* ==========================================================================
-   5. Audio Engine + Dynamic M3 Palette Morph per Song
+   4. Audio / YouTube Playback + Floating Picker Tray
    ========================================================================== */
 function playTrackAtIndex(idx) {
   const track = state.filteredTracks[idx];
   if (!track) return;
 
-  if (state.currentIndex === idx && state.isPlaying) {
+  if (state.currentIndex === idx && state.isPlaying && !track.ytVideoId) {
     audioPlayer.pause();
     state.isPlaying = false;
     updatePlayerUI();
@@ -389,30 +409,104 @@ function playTrackAtIndex(idx) {
   document.getElementById("dock-title").textContent = track.title;
   document.getElementById("dock-artist").textContent = track.artist;
 
-  if (track.previewUrl) {
-    audioPlayer.removeAttribute("crossorigin");
-    audioPlayer.src = track.previewUrl;
-    audioPlayer.volume = Number(volumeBar.value);
-    audioPlayer.play().catch(() => {});
+  if (track.ytVideoId) {
+    audioPlayer.pause();
+    trayYtIframe.src = `https://www.youtube.com/embed/${track.ytVideoId}?autoplay=1`;
+    trayYtIframe.classList.remove("hidden");
+    trayArt.classList.add("hidden");
     state.isPlaying = true;
-    document.getElementById("stat-audio").textContent = "Playing 30s";
+    document.getElementById("stat-audio").textContent = "Playing YouTube";
+    openPickerTray(); // Automatically reveal YT video in the floating tray
   } else {
-    state.isPlaying = false;
-    document.getElementById("stat-audio").textContent = "No Preview";
+    trayYtIframe.src = "";
+    trayYtIframe.classList.add("hidden");
+    trayArt.classList.remove("hidden");
+
+    if (track.previewUrl) {
+      audioPlayer.removeAttribute("crossorigin");
+      audioPlayer.src = track.previewUrl;
+      audioPlayer.volume = Number(volumeBar.value);
+      audioPlayer.play().catch(() => {});
+      state.isPlaying = true;
+      document.getElementById("stat-audio").textContent = "Playing 30s";
+    } else {
+      state.isPlaying = false;
+      document.getElementById("stat-audio").textContent = "Tap Open YT Music";
+    }
   }
 
+  syncTrayDetails();
   updatePlayerUI();
   renderGrid(state.filteredTracks);
+  renderTrayQueue();
+}
+
+function syncTrayDetails() {
+  const track = state.filteredTracks[state.currentIndex];
+  if (!track) return;
+
+  trayArt.src = track.artwork;
+  document.getElementById("tray-title").textContent = track.title;
+  document.getElementById("tray-artist").textContent = `${track.artist} • ${track.album}`;
+  document.getElementById("tray-region-badge").textContent = track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
+  document.getElementById("tray-year-badge").textContent = track.releaseYear;
+  document.getElementById("tray-genre-badge").textContent = track.genre;
+
+  const ytmUrl = track.ytVideoId
+    ? `https://music.youtube.com/watch?v=${track.ytVideoId}`
+    : `https://music.youtube.com/search?q=${encodeURIComponent(`${track.title} ${track.artist}`)}`;
+  document.getElementById("tray-ytm-link").href = ytmUrl;
+
+  const likeBtn = document.getElementById("tray-like-btn");
+  const isLiked = Boolean(state.likedMap[track.id]);
+  likeBtn.textContent = isLiked ? "♥" : "♡";
+  likeBtn.classList.toggle("liked", isLiked);
+  likeBtn.onclick = () => toggleLike(track);
+
+  document.getElementById("tray-share-btn").onclick = async () => {
+    const shareText = `Listening to ${track.title} by ${track.artist} on MuzikiGlass! ${ytmUrl}`;
+    if (navigator.share) {
+      navigator.share({ title: track.title, text: shareText, url: ytmUrl }).catch(() => {});
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareText);
+      showToast("Song link copied to clipboard!");
+    }
+  };
+}
+
+function renderTrayQueue() {
+  const listEl = document.getElementById("tray-queue-list");
+  document.getElementById("picker-count").textContent = `${state.filteredTracks.length} tracks`;
+  listEl.innerHTML = "";
+
+  state.filteredTracks.forEach((track, idx) => {
+    const row = document.createElement("div");
+    row.className = `queue-item${idx === state.currentIndex ? " active" : ""}`;
+    row.innerHTML = `
+      <img src="${track.artwork}" alt="${track.title}" loading="lazy" />
+      <div class="queue-meta">
+        <strong>${track.title}</strong>
+        <span>${track.artist} • ${track.releaseYear}</span>
+      </div>
+      <span class="mono-time">${track.region === "uganda" ? "🇺🇬" : "🌍"}</span>
+    `;
+    row.addEventListener("click", () => playTrackAtIndex(idx));
+    listEl.appendChild(row);
+  });
 }
 
 function updatePlayerUI() {
-  playPauseBtn.textContent = state.isPlaying ? "⏸" : "▶";
+  const icon = state.isPlaying ? "⏸" : "▶";
+  playPauseBtn.textContent = icon;
+  trayPlayBtn.textContent = icon;
   playPauseBtn.classList.toggle("is-playing", state.isPlaying);
+  trayPlayBtn.classList.toggle("is-playing", state.isPlaying);
   visualizer.classList.toggle("active", state.isPlaying);
   dockArtWrap.classList.toggle("spinning", state.isPlaying);
 }
 
-playPauseBtn.addEventListener("click", () => {
+function togglePlayPause(e) {
+  if (e) e.stopPropagation();
   if (state.currentIndex < 0 && state.filteredTracks.length) {
     playTrackAtIndex(0);
     return;
@@ -426,41 +520,100 @@ playPauseBtn.addEventListener("click", () => {
   }
   updatePlayerUI();
   renderGrid(state.filteredTracks);
-});
+}
 
-document.getElementById("prev-btn").addEventListener("click", () => {
+function playNext(e) {
+  if (e) e.stopPropagation();
+  if (!state.filteredTracks.length) return;
+  const next = state.shuffle
+    ? Math.floor(Math.random() * state.filteredTracks.length)
+    : (state.currentIndex + 1) % state.filteredTracks.length;
+  playTrackAtIndex(next);
+}
+
+function playPrev(e) {
+  if (e) e.stopPropagation();
   if (!state.filteredTracks.length) return;
   const prev = (state.currentIndex - 1 + state.filteredTracks.length) % state.filteredTracks.length;
   playTrackAtIndex(prev);
+}
+
+// Mini dock buttons stop propagation so they don't hijack clicks meant for pause/skip
+playPauseBtn.addEventListener("click", togglePlayPause);
+document.getElementById("prev-btn").addEventListener("click", playPrev);
+document.getElementById("next-btn").addEventListener("click", playNext);
+seekBar.addEventListener("click", (e) => e.stopPropagation());
+
+// Clicking anywhere else on the bottom dock opens the floating Picker Tray!
+playerDock.addEventListener("click", openPickerTray);
+
+function openPickerTray() {
+  if (state.currentIndex < 0 && state.filteredTracks.length) {
+    syncTrayDetails();
+  }
+  renderTrayQueue();
+  trayBackdrop.classList.add("open");
+  trayBackdrop.setAttribute("aria-hidden", "false");
+}
+
+function closePickerTray() {
+  trayBackdrop.classList.remove("open");
+  trayBackdrop.setAttribute("aria-hidden", "true");
+}
+
+document.getElementById("tray-close-btn").addEventListener("click", closePickerTray);
+document.getElementById("tray-handle").addEventListener("click", closePickerTray);
+trayBackdrop.addEventListener("click", (e) => {
+  if (e.target === trayBackdrop) closePickerTray();
 });
 
-document.getElementById("next-btn").addEventListener("click", () => {
-  if (!state.filteredTracks.length) return;
-  const next = (state.currentIndex + 1) % state.filteredTracks.length;
-  playTrackAtIndex(next);
+// Tray playback controls
+trayPlayBtn.addEventListener("click", togglePlayPause);
+document.getElementById("tray-next-btn").addEventListener("click", playNext);
+document.getElementById("tray-prev-btn").addEventListener("click", playPrev);
+
+document.getElementById("tray-shuffle-btn").addEventListener("click", (e) => {
+  state.shuffle = !state.shuffle;
+  e.target.classList.toggle("active-toggle", state.shuffle);
+  showToast(state.shuffle ? "Shuffle On 🔀" : "Shuffle Off");
 });
 
+document.getElementById("tray-repeat-btn").addEventListener("click", (e) => {
+  state.repeat = !state.repeat;
+  e.target.classList.toggle("active-toggle", state.repeat);
+  showToast(state.repeat ? "Repeat Track On 🔁" : "Repeat Off");
+});
+
+// Sync seek bars & audio events
 audioPlayer.addEventListener("timeupdate", () => {
   if (!audioPlayer.duration) return;
   const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
   seekBar.value = pct;
-  document.getElementById("current-time").textContent = formatTime(audioPlayer.currentTime);
-  document.getElementById("total-time").textContent = formatTime(audioPlayer.duration);
+  traySeekBar.value = pct;
+  const cur = formatTime(audioPlayer.currentTime);
+  const tot = formatTime(audioPlayer.duration);
+  document.getElementById("current-time").textContent = cur;
+  document.getElementById("total-time").textContent = tot;
+  document.getElementById("tray-current-time").textContent = cur;
+  document.getElementById("tray-total-time").textContent = tot;
 });
 
 audioPlayer.addEventListener("ended", () => {
-  const next = (state.currentIndex + 1) % state.filteredTracks.length;
-  playTrackAtIndex(next);
+  if (state.repeat) {
+    audioPlayer.currentTime = 0;
+    audioPlayer.play().catch(() => {});
+  } else {
+    playNext();
+  }
 });
 
-seekBar.addEventListener("input", () => {
+function handleSeek(val) {
   if (!audioPlayer.duration) return;
-  audioPlayer.currentTime = (seekBar.value / 100) * audioPlayer.duration;
-});
-
-volumeBar.addEventListener("input", () => {
-  audioPlayer.volume = Number(volumeBar.value);
-});
+  audioPlayer.currentTime = (val / 100) * audioPlayer.duration;
+}
+seekBar.addEventListener("input", () => handleSeek(seekBar.value));
+traySeekBar.addEventListener("input", () => handleSeek(traySeekBar.value));
+volumeBar.addEventListener("input", () => { audioPlayer.volume = Number(volumeBar.value); });
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
@@ -469,8 +622,39 @@ function formatTime(sec) {
 }
 
 /* ==========================================================================
-   6. Navigation & Filter Event Listeners
+   5. YouTube Music API Key Modal + Filters
    ========================================================================== */
+document.getElementById("yt-api-btn").addEventListener("click", () => {
+  document.getElementById("yt-api-key-input").value = state.ytApiKey;
+  ytModalBackdrop.classList.add("open");
+});
+
+document.getElementById("yt-modal-close").addEventListener("click", () => {
+  ytModalBackdrop.classList.remove("open");
+});
+
+ytModalBackdrop.addEventListener("click", (e) => {
+  if (e.target === ytModalBackdrop) ytModalBackdrop.classList.remove("open");
+});
+
+document.getElementById("yt-save-btn").addEventListener("click", () => {
+  const key = document.getElementById("yt-api-key-input").value.trim();
+  if (!key) return showToast("Please paste a valid YouTube API key");
+  state.ytApiKey = key;
+  localStorage.setItem("muzikiglass_yt_key", key);
+  ytModalBackdrop.classList.remove("open");
+  showToast("YouTube Music API Connected!");
+  loadCharts();
+});
+
+document.getElementById("yt-clear-btn").addEventListener("click", () => {
+  state.ytApiKey = "";
+  localStorage.removeItem("muzikiglass_yt_key");
+  ytModalBackdrop.classList.remove("open");
+  showToast("Switched back to free latest charts");
+  loadCharts();
+});
+
 document.querySelectorAll(".seg-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("active"));
@@ -502,9 +686,7 @@ document.getElementById("search-form").addEventListener("submit", (e) => {
   loadCharts();
 });
 
-document.getElementById("refresh-btn").addEventListener("click", () => {
-  loadCharts();
-});
+document.getElementById("refresh-btn").addEventListener("click", () => loadCharts());
 
 /* ==========================================================================
    Boot
