@@ -1,6 +1,5 @@
 /* ==========================================================================
-   MUZIKIGLASS v2 — Latest Ugandan & Global Music + Now-Playing Picker Tray
-   Supports Latest 2024-2026 Drops + Optional YouTube Data API v3 Integration
+   MUZIKIGLASS v3 — Butter-Smooth Music + Live FM Radio + Synced Lyrics
    ========================================================================== */
 
 const EXPRESSIVE_PALETTES = [
@@ -11,7 +10,6 @@ const EXPRESSIVE_PALETTES = [
   { name: "Pearl Crimson", primary: "#fb7185", primaryContainer: "rgba(251, 113, 133, 0.24)", secondary: "#fcd34d", secondaryContainer: "rgba(252, 211, 77, 0.2)", tertiary: "#38bdf8" },
 ];
 
-// Fresh 2024–2026 queries (eliminates decade-old classics from dominating top charts)
 const QUERY_PRESETS = {
   trending: {
     uganda: ["Joshua Baraka", "Elijah Kitaka", "Azawi", "Mudra Uganda", "Winnie Nwagi", "Lydia Jazmine"],
@@ -62,8 +60,39 @@ const FALLBACK_TRACKS = [
   },
 ];
 
+// Curated HTTPS Radio Fallbacks in case Radio-Browser is busy
+const FALLBACK_RADIO = [
+  {
+    id: "rad-1",
+    title: "Capital FM 91.3 Kampala",
+    artist: "Live Uganda FM",
+    album: "Live Broadcast",
+    genre: "Uganda Hit Radio",
+    region: "radio",
+    isRadio: true,
+    artwork: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
+    previewUrl: "https://capitalfm.atunwadigital.streamguys1.com/capitalfm",
+    releaseDate: "2026-01-01",
+    releaseYear: "LIVE",
+  },
+  {
+    id: "rad-2",
+    title: "SomaFM Groove Salad",
+    artist: "Global Chill & Beats",
+    album: "Live Broadcast",
+    genre: "Global Radio",
+    region: "radio",
+    isRadio: true,
+    artwork: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80",
+    previewUrl: "https://ice2.somafm.com/groovesalad-128-mp3",
+    releaseDate: "2026-01-01",
+    releaseYear: "LIVE",
+  },
+];
+
 const state = {
   tracks: [],
+  radioStations: [],
   filteredTracks: [],
   likedMap: JSON.parse(localStorage.getItem("muzikiglass_liked") || "{}"),
   ytApiKey: localStorage.getItem("muzikiglass_yt_key") || "",
@@ -76,9 +105,10 @@ const state = {
   shuffle: false,
   repeat: false,
   paletteIdx: 0,
+  syncedLines: [],
+  activeLyricIdx: -1,
 };
 
-// DOM Refs
 const tracksGrid = document.getElementById("tracks-grid");
 const audioPlayer = document.getElementById("audio-player");
 const playerDock = document.getElementById("player-dock");
@@ -95,28 +125,28 @@ const trayYtIframe = document.getElementById("tray-yt-iframe");
 const trayArt = document.getElementById("tray-art");
 
 /* ==========================================================================
-   1. Glass Lighting + Material Expressive Palette + Toast
+   1. Butter-Smooth Single-Card Pointer Lighting + Palette + Toast
    ========================================================================== */
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
   toast.classList.add("show");
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove("show"), 2400);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
 function attachGlassLighting() {
+  let rafId = 0;
   document.addEventListener("pointermove", (e) => {
-    document.querySelectorAll(".liquid-card").forEach((card) => {
+    const card = e.target.closest(".liquid-card");
+    if (!card || rafId) return;
+    rafId = requestAnimationFrame(() => {
       const rect = card.getBoundingClientRect();
       card.style.setProperty("--mouse-x", `${((e.clientX - rect.left) / rect.width) * 100}%`);
       card.style.setProperty("--mouse-y", `${((e.clientY - rect.top) / rect.height) * 100}%`);
+      rafId = 0;
     });
-  });
-
-  document.getElementById("refraction-range").addEventListener("input", (e) => {
-    document.getElementById("disp-text").setAttribute("scale", Number(e.target.value));
-  });
+  }, { passive: true });
 }
 
 function applyPalette(index) {
@@ -137,7 +167,7 @@ document.getElementById("theme-cycle-btn").addEventListener("click", () => {
 });
 
 /* ==========================================================================
-   2. Music Fetchers: YouTube Data API v3 (if key saved) + Latest iTunes Sync
+   2. Music + Live Radio + YouTube Fetchers
    ========================================================================== */
 async function fetchYouTubeTrending(regionCode, regionTag) {
   const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=${regionCode}&maxResults=12&key=${encodeURIComponent(state.ytApiKey)}`;
@@ -187,31 +217,66 @@ async function fetchItunesLatest(term, regionTag) {
   if (!res.ok) throw new Error("iTunes fetch failed");
   const data = await res.json();
 
-  // Sort results by newest releaseDate and keep the top 3 newest per query
-  const sorted = (data.results || [])
+  return (data.results || [])
     .filter((item) => item.trackName && item.artworkUrl100)
     .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0))
-    .slice(0, 3);
+    .slice(0, 3)
+    .map((item) => ({
+      id: String(item.trackId),
+      title: item.trackName,
+      artist: item.artistName,
+      album: item.collectionName || "Single",
+      genre: item.primaryGenreName || "Music",
+      region: regionTag,
+      artwork: item.artworkUrl100.replace("100x100bb", "600x600bb"),
+      previewUrl: item.previewUrl || "",
+      releaseDate: item.releaseDate || "2024-01-01",
+      releaseYear: item.releaseDate ? item.releaseDate.slice(0, 4) : "2025",
+    }));
+}
 
-  return sorted.map((item) => ({
-    id: String(item.trackId),
-    title: item.trackName,
-    artist: item.artistName,
-    album: item.collectionName || "Single",
-    genre: item.primaryGenreName || "Music",
-    region: regionTag,
-    artwork: item.artworkUrl100.replace("100x100bb", "600x600bb"),
-    previewUrl: item.previewUrl || "",
-    releaseDate: item.releaseDate || "2024-01-01",
-    releaseYear: item.releaseDate ? item.releaseDate.slice(0, 4) : "2025",
-  }));
+async function fetchLiveRadioStations() {
+  try {
+    const [ugRes, glRes] = await Promise.all([
+      fetch("https://de1.api.radio-browser.info/json/stations/search?countrycode=UG&is_https=true&hidebroken=true&order=clickcount&reverse=true&limit=10"),
+      fetch("https://de1.api.radio-browser.info/json/stations/search?is_https=true&hidebroken=true&order=votes&reverse=true&limit=8"),
+    ]);
+
+    const ugData = ugRes.ok ? await ugRes.json() : [];
+    const glData = glRes.ok ? await glRes.json() : [];
+
+    const mapStation = (s, label) => ({
+      id: `rad-${s.stationuuid}`,
+      title: s.name.trim(),
+      artist: s.country ? `${s.country} • ${s.bitrate || 128}kbps` : label,
+      album: "Live FM Stream",
+      genre: (s.tags || label).split(",")[0] || "Radio",
+      region: "radio",
+      isRadio: true,
+      artwork: s.favicon && s.favicon.startsWith("https://")
+        ? s.favicon
+        : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
+      previewUrl: s.url_resolved || s.url,
+      releaseDate: "2026-01-01",
+      releaseYear: "LIVE",
+    });
+
+    const combined = [
+      ...ugData.filter((s) => (s.url_resolved || "").startsWith("https://")).map((s) => mapStation(s, "Uganda FM")),
+      ...glData.filter((s) => (s.url_resolved || "").startsWith("https://")).map((s) => mapStation(s, "Global FM")),
+    ];
+
+    state.radioStations = combined.length ? combined : FALLBACK_RADIO;
+  } catch {
+    state.radioStations = FALLBACK_RADIO;
+  }
 }
 
 async function loadCharts() {
   const statusEl = document.getElementById("live-status-text");
   const sourceEl = document.getElementById("stat-source");
   statusEl.textContent = "SYNCING LATEST UGANDA & GLOBAL MUSIC...";
-  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">Fetching latest 2025/2026 waves...</div>`;
+  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:20px;border-radius:22px;">Syncing latest waves...</div>`;
 
   try {
     let fetched = [];
@@ -233,7 +298,7 @@ async function loadCharts() {
         fetched = [...ugYt, ...glYt];
       }
     } else {
-      sourceEl.textContent = "Latest Releases";
+      sourceEl.textContent = "Latest + Live Radio";
       if (state.searchQuery.trim()) {
         const q = state.searchQuery.trim();
         const [ugRes, glRes] = await Promise.all([
@@ -273,10 +338,6 @@ async function loadCharts() {
       ? "YOUTUBE MUSIC LIVE • UGANDA & GLOBAL"
       : "LATEST RELEASES • KAMPALA TO THE WORLD";
   } catch (err) {
-    console.warn("API fallback triggered:", err);
-    if (state.ytApiKey) {
-      showToast("YouTube API key invalid or quota exceeded — using free charts");
-    }
     state.tracks = FALLBACK_TRACKS;
     statusEl.textContent = "OFFLINE PULSE • CURATED CATALOG";
   }
@@ -286,7 +347,95 @@ async function loadCharts() {
 }
 
 /* ==========================================================================
-   3. Filter, Sort, Liked Songs & Render
+   3. Real-Time Synced Lyrics Engine (LRCLIB)
+   ========================================================================== */
+function cleanTrackName(name) {
+  return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].trim();
+}
+
+function parseLrc(lrcText) {
+  const lines = [];
+  lrcText.split("\n").forEach((raw) => {
+    const match = raw.match(/\[(\d{2}):(\d{2}(?:\.\d+)?)\](.*)/);
+    if (match) {
+      const time = Number(match[1]) * 60 + Number(match[2]);
+      const text = match[3].trim();
+      if (text) lines.push({ time, text });
+    }
+  });
+  return lines;
+}
+
+async function loadLyricsForTrack(track) {
+  const box = document.getElementById("tray-lyrics-box");
+  state.syncedLines = [];
+  state.activeLyricIdx = -1;
+
+  if (!track || track.isRadio) {
+    box.innerHTML = `<p class="lyrics-placeholder">📻 Live FM Radio Broadcast — lyrics are shown for music tracks.</p>`;
+    return;
+  }
+
+  box.innerHTML = `<p class="lyrics-placeholder">Searching synced lyrics for "${track.title}"...</p>`;
+
+  try {
+    const cleanTitle = cleanTrackName(track.title);
+    const cleanArtist = cleanTrackName(track.artist);
+    let res = await fetch(`https://lrclib.net/api/get?track_name=${encodeURIComponent(cleanTitle)}&artist_name=${encodeURIComponent(cleanArtist)}`);
+    let data = res.ok ? await res.json() : null;
+
+    if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
+      const searchRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(`${cleanTitle} ${cleanArtist}`)}`);
+      const list = searchRes.ok ? await searchRes.json() : [];
+      data = list[0] || null;
+    }
+
+    if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
+      box.innerHTML = `<p class="lyrics-placeholder">No lyrics found in LRCLIB yet for this track. Try opening it on YT Music!</p>`;
+      return;
+    }
+
+    if (data.syncedLyrics) {
+      state.syncedLines = parseLrc(data.syncedLyrics);
+      box.innerHTML = "";
+      state.syncedLines.forEach((line, idx) => {
+        const p = document.createElement("p");
+        p.className = "lyric-line";
+        p.dataset.idx = idx;
+        p.textContent = line.text;
+        p.addEventListener("click", () => {
+          if (audioPlayer.duration) audioPlayer.currentTime = line.time;
+        });
+        box.appendChild(p);
+      });
+    } else {
+      box.innerHTML = `<div class="lyric-plain">${data.plainLyrics}</div>`;
+    }
+  } catch {
+    box.innerHTML = `<p class="lyrics-placeholder">Unable to fetch lyrics right now.</p>`;
+  }
+}
+
+function updateActiveLyric(currentTime) {
+  if (!state.syncedLines.length) return;
+  let active = -1;
+  for (let i = 0; i < state.syncedLines.length; i++) {
+    if (currentTime >= state.syncedLines[i].time) active = i;
+    else break;
+  }
+  if (active === state.activeLyricIdx) return;
+  state.activeLyricIdx = active;
+
+  const box = document.getElementById("tray-lyrics-box");
+  box.querySelectorAll(".lyric-line").forEach((el, idx) => {
+    const isCurrent = idx === active;
+    el.classList.toggle("active-line", isCurrent);
+    if (isCurrent) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+/* ==========================================================================
+   4. Filter, Sort & Render
    ========================================================================== */
 function updateLikedCounter() {
   document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length;
@@ -308,20 +457,26 @@ function toggleLike(track, e) {
 }
 
 function filterAndRender() {
-  let list = state.region === "liked"
-    ? Object.values(state.likedMap)
-    : [...state.tracks];
-
-  if (state.region === "uganda" || state.region === "global") {
-    list = list.filter((t) => t.region === state.region);
+  let list = [];
+  if (state.region === "liked") {
+    list = Object.values(state.likedMap);
+  } else if (state.region === "radio") {
+    list = [...state.radioStations];
+  } else {
+    list = [...state.tracks];
+    if (state.region === "uganda" || state.region === "global") {
+      list = list.filter((t) => t.region === state.region);
+    }
   }
 
-  if (state.sortBy === "newest") {
-    list.sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0));
-  } else if (state.sortBy === "title") {
-    list.sort((a, b) => a.title.localeCompare(b.title));
-  } else if (state.sortBy === "artist") {
-    list.sort((a, b) => a.artist.localeCompare(b.artist));
+  if (state.region !== "radio") {
+    if (state.sortBy === "newest") {
+      list.sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0));
+    } else if (state.sortBy === "title") {
+      list.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (state.sortBy === "artist") {
+      list.sort((a, b) => a.artist.localeCompare(b.artist));
+    }
   }
 
   state.filteredTracks = list;
@@ -336,7 +491,7 @@ function renderSpotlight(track) {
   document.getElementById("spotlight-title").textContent = track.title;
   document.getElementById("spotlight-artist").textContent = `${track.artist} • ${track.releaseYear}`;
   document.getElementById("spotlight-region").textContent =
-    track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
+    track.isRadio ? "📻 LIVE FM" : track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
   document.getElementById("spotlight-play-btn").onclick = () => playTrackAtIndex(0);
 }
 
@@ -344,10 +499,11 @@ function renderGrid(list) {
   tracksGrid.innerHTML = "";
 
   if (!list.length) {
-    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">No tracks found here yet. Tap ♥ on any song to save it!</div>`;
+    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:20px;border-radius:22px;">Nothing here yet. Try another tab or tap ♥ to save tracks!</div>`;
     return;
   }
 
+  const frag = document.createDocumentFragment();
   list.forEach((track, idx) => {
     const card = document.createElement("article");
     const isPlayingThis =
@@ -357,13 +513,11 @@ function renderGrid(list) {
     const isLiked = Boolean(state.likedMap[track.id]);
 
     card.className = `track-card liquid-card${isPlayingThis ? " playing" : ""}`;
-    card.style.animationDelay = `${Math.min(idx * 25, 280)}ms`;
-
     card.innerHTML = `
       <div class="track-cover-wrap">
         <img src="${track.artwork}" alt="${track.title}" loading="lazy" />
         <span class="rank-badge">#${idx + 1}</span>
-        <span class="region-badge">${track.region === "uganda" ? "🇺🇬 UG" : "🌍 GLB"}</span>
+        <span class="region-badge">${track.isRadio ? "📻 FM" : track.region === "uganda" ? "🇺🇬 UG" : "🌍 GLB"}</span>
         <button class="card-like-btn ${isLiked ? "liked" : ""}" aria-label="Like ${track.title}">
           ${isLiked ? "♥" : "♡"}
         </button>
@@ -381,12 +535,14 @@ function renderGrid(list) {
 
     card.querySelector(".card-like-btn").addEventListener("click", (e) => toggleLike(track, e));
     card.addEventListener("click", () => playTrackAtIndex(idx));
-    tracksGrid.appendChild(card);
+    frag.appendChild(card);
   });
+
+  tracksGrid.appendChild(frag);
 }
 
 /* ==========================================================================
-   4. Audio / YouTube Playback + Floating Picker Tray
+   5. Playback + Zero-Scroll Tray + Queue/Lyrics Switcher
    ========================================================================== */
 function playTrackAtIndex(idx) {
   const track = state.filteredTracks[idx];
@@ -401,7 +557,6 @@ function playTrackAtIndex(idx) {
   }
 
   state.currentIndex = idx;
-
   const hash = track.title.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
   applyPalette(hash % EXPRESSIVE_PALETTES.length);
 
@@ -416,26 +571,33 @@ function playTrackAtIndex(idx) {
     trayArt.classList.add("hidden");
     state.isPlaying = true;
     document.getElementById("stat-audio").textContent = "Playing YouTube";
-    openPickerTray(); // Automatically reveal YT video in the floating tray
+    openPickerTray();
   } else {
     trayYtIframe.src = "";
     trayYtIframe.classList.add("hidden");
     trayArt.classList.remove("hidden");
 
     if (track.previewUrl) {
-      audioPlayer.removeAttribute("crossorigin");
       audioPlayer.src = track.previewUrl;
       audioPlayer.volume = Number(volumeBar.value);
-      audioPlayer.play().catch(() => {});
+      audioPlayer.play().catch(() => showToast("Stream blocked by station/browser — try another"));
       state.isPlaying = true;
-      document.getElementById("stat-audio").textContent = "Playing 30s";
+      document.getElementById("stat-audio").textContent = track.isRadio ? "🔴 Live Radio" : "Playing 30s";
     } else {
       state.isPlaying = false;
-      document.getElementById("stat-audio").textContent = "Tap Open YT Music";
+      document.getElementById("stat-audio").textContent = "Open YT Music";
     }
   }
 
+  if (track.isRadio) {
+    document.getElementById("current-time").textContent = "LIVE";
+    document.getElementById("total-time").textContent = "FM";
+    document.getElementById("tray-current-time").textContent = "LIVE";
+    document.getElementById("tray-total-time").textContent = "FM";
+  }
+
   syncTrayDetails();
+  loadLyricsForTrack(track);
   updatePlayerUI();
   renderGrid(state.filteredTracks);
   renderTrayQueue();
@@ -448,7 +610,9 @@ function syncTrayDetails() {
   trayArt.src = track.artwork;
   document.getElementById("tray-title").textContent = track.title;
   document.getElementById("tray-artist").textContent = `${track.artist} • ${track.album}`;
-  document.getElementById("tray-region-badge").textContent = track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
+  document.getElementById("tray-mode-badge").textContent = track.isRadio ? "📻 LIVE RADIO" : "NOW PLAYING";
+  document.getElementById("tray-region-badge").textContent =
+    track.isRadio ? "📻 FM" : track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
   document.getElementById("tray-year-badge").textContent = track.releaseYear;
   document.getElementById("tray-genre-badge").textContent = track.genre;
 
@@ -464,21 +628,22 @@ function syncTrayDetails() {
   likeBtn.onclick = () => toggleLike(track);
 
   document.getElementById("tray-share-btn").onclick = async () => {
-    const shareText = `Listening to ${track.title} by ${track.artist} on MuzikiGlass! ${ytmUrl}`;
+    const shareText = `Listening to ${track.title} (${track.artist}) on MuzikiGlass!`;
     if (navigator.share) {
       navigator.share({ title: track.title, text: shareText, url: ytmUrl }).catch(() => {});
     } else if (navigator.clipboard) {
-      await navigator.clipboard.writeText(shareText);
-      showToast("Song link copied to clipboard!");
+      await navigator.clipboard.writeText(`${shareText} ${ytmUrl}`);
+      showToast("Link copied!");
     }
   };
 }
 
 function renderTrayQueue() {
   const listEl = document.getElementById("tray-queue-list");
-  document.getElementById("picker-count").textContent = `${state.filteredTracks.length} tracks`;
+  document.getElementById("picker-count").textContent = `${state.filteredTracks.length} items`;
   listEl.innerHTML = "";
 
+  const frag = document.createDocumentFragment();
   state.filteredTracks.forEach((track, idx) => {
     const row = document.createElement("div");
     row.className = `queue-item${idx === state.currentIndex ? " active" : ""}`;
@@ -486,13 +651,14 @@ function renderTrayQueue() {
       <img src="${track.artwork}" alt="${track.title}" loading="lazy" />
       <div class="queue-meta">
         <strong>${track.title}</strong>
-        <span>${track.artist} • ${track.releaseYear}</span>
+        <span>${track.artist}</span>
       </div>
-      <span class="mono-time">${track.region === "uganda" ? "🇺🇬" : "🌍"}</span>
+      <span class="mono-time">${track.isRadio ? "📻" : track.region === "uganda" ? "🇺🇬" : "🌍"}</span>
     `;
     row.addEventListener("click", () => playTrackAtIndex(idx));
-    listEl.appendChild(row);
+    frag.appendChild(row);
   });
+  listEl.appendChild(frag);
 }
 
 function updatePlayerUI() {
@@ -507,10 +673,7 @@ function updatePlayerUI() {
 
 function togglePlayPause(e) {
   if (e) e.stopPropagation();
-  if (state.currentIndex < 0 && state.filteredTracks.length) {
-    playTrackAtIndex(0);
-    return;
-  }
+  if (state.currentIndex < 0 && state.filteredTracks.length) return playTrackAtIndex(0);
   if (state.isPlaying) {
     audioPlayer.pause();
     state.isPlaying = false;
@@ -538,19 +701,14 @@ function playPrev(e) {
   playTrackAtIndex(prev);
 }
 
-// Mini dock buttons stop propagation so they don't hijack clicks meant for pause/skip
 playPauseBtn.addEventListener("click", togglePlayPause);
 document.getElementById("prev-btn").addEventListener("click", playPrev);
 document.getElementById("next-btn").addEventListener("click", playNext);
 seekBar.addEventListener("click", (e) => e.stopPropagation());
-
-// Clicking anywhere else on the bottom dock opens the floating Picker Tray!
 playerDock.addEventListener("click", openPickerTray);
 
 function openPickerTray() {
-  if (state.currentIndex < 0 && state.filteredTracks.length) {
-    syncTrayDetails();
-  }
+  if (state.currentIndex < 0 && state.filteredTracks.length) syncTrayDetails();
   renderTrayQueue();
   trayBackdrop.classList.add("open");
   trayBackdrop.setAttribute("aria-hidden", "false");
@@ -562,12 +720,19 @@ function closePickerTray() {
 }
 
 document.getElementById("tray-close-btn").addEventListener("click", closePickerTray);
-document.getElementById("tray-handle").addEventListener("click", closePickerTray);
-trayBackdrop.addEventListener("click", (e) => {
-  if (e.target === trayBackdrop) closePickerTray();
+trayBackdrop.addEventListener("click", (e) => { if (e.target === trayBackdrop) closePickerTray(); });
+
+// Queue vs Lyrics Tabs inside Tray
+document.querySelectorAll(".picker-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".picker-tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    const isLyrics = tab.dataset.pane === "lyrics";
+    document.getElementById("tray-queue-list").classList.toggle("hidden", isLyrics);
+    document.getElementById("tray-lyrics-box").classList.toggle("hidden", !isLyrics);
+  });
 });
 
-// Tray playback controls
 trayPlayBtn.addEventListener("click", togglePlayPause);
 document.getElementById("tray-next-btn").addEventListener("click", playNext);
 document.getElementById("tray-prev-btn").addEventListener("click", playPrev);
@@ -581,12 +746,14 @@ document.getElementById("tray-shuffle-btn").addEventListener("click", (e) => {
 document.getElementById("tray-repeat-btn").addEventListener("click", (e) => {
   state.repeat = !state.repeat;
   e.target.classList.toggle("active-toggle", state.repeat);
-  showToast(state.repeat ? "Repeat Track On 🔁" : "Repeat Off");
+  showToast(state.repeat ? "Repeat On 🔁" : "Repeat Off");
 });
 
-// Sync seek bars & audio events
 audioPlayer.addEventListener("timeupdate", () => {
-  if (!audioPlayer.duration) return;
+  const track = state.filteredTracks[state.currentIndex];
+  if (track?.isRadio) return;
+  updateActiveLyric(audioPlayer.currentTime);
+  if (!audioPlayer.duration || !isFinite(audioPlayer.duration)) return;
   const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
   seekBar.value = pct;
   traySeekBar.value = pct;
@@ -608,7 +775,7 @@ audioPlayer.addEventListener("ended", () => {
 });
 
 function handleSeek(val) {
-  if (!audioPlayer.duration) return;
+  if (!audioPlayer.duration || !isFinite(audioPlayer.duration)) return;
   audioPlayer.currentTime = (val / 100) * audioPlayer.duration;
 }
 seekBar.addEventListener("input", () => handleSeek(seekBar.value));
@@ -622,24 +789,18 @@ function formatTime(sec) {
 }
 
 /* ==========================================================================
-   5. YouTube Music API Key Modal + Filters
+   6. Navigation, Radio Switcher & YouTube API Modal
    ========================================================================== */
 document.getElementById("yt-api-btn").addEventListener("click", () => {
   document.getElementById("yt-api-key-input").value = state.ytApiKey;
   ytModalBackdrop.classList.add("open");
 });
-
-document.getElementById("yt-modal-close").addEventListener("click", () => {
-  ytModalBackdrop.classList.remove("open");
-});
-
-ytModalBackdrop.addEventListener("click", (e) => {
-  if (e.target === ytModalBackdrop) ytModalBackdrop.classList.remove("open");
-});
+document.getElementById("yt-modal-close").addEventListener("click", () => ytModalBackdrop.classList.remove("open"));
+ytModalBackdrop.addEventListener("click", (e) => { if (e.target === ytModalBackdrop) ytModalBackdrop.classList.remove("open"); });
 
 document.getElementById("yt-save-btn").addEventListener("click", () => {
   const key = document.getElementById("yt-api-key-input").value.trim();
-  if (!key) return showToast("Please paste a valid YouTube API key");
+  if (!key) return showToast("Paste a valid YouTube API key");
   state.ytApiKey = key;
   localStorage.setItem("muzikiglass_yt_key", key);
   ytModalBackdrop.classList.remove("open");
@@ -656,10 +817,15 @@ document.getElementById("yt-clear-btn").addEventListener("click", () => {
 });
 
 document.querySelectorAll(".seg-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
     document.querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     state.region = btn.dataset.region;
+
+    if (state.region === "radio" && !state.radioStations.length) {
+      tracksGrid.innerHTML = `<div class="liquid-card" style="padding:20px;border-radius:22px;">Tuning into Live Uganda &amp; Global FM Radio...</div>`;
+      await fetchLiveRadioStations();
+    }
     filterAndRender();
   });
 });
@@ -671,6 +837,10 @@ document.querySelectorAll(".chip").forEach((chip) => {
     state.genre = chip.dataset.genre;
     state.searchQuery = "";
     document.getElementById("search-input").value = "";
+    if (state.region === "radio") {
+      state.region = "all";
+      document.querySelectorAll(".seg-btn").forEach((b) => b.classList.toggle("active", b.dataset.region === "all"));
+    }
     loadCharts();
   });
 });
@@ -686,7 +856,13 @@ document.getElementById("search-form").addEventListener("submit", (e) => {
   loadCharts();
 });
 
-document.getElementById("refresh-btn").addEventListener("click", () => loadCharts());
+document.getElementById("refresh-btn").addEventListener("click", () => {
+  if (state.region === "radio") {
+    fetchLiveRadioStations().then(filterAndRender);
+  } else {
+    loadCharts();
+  }
+});
 
 /* ==========================================================================
    Boot
@@ -694,3 +870,4 @@ document.getElementById("refresh-btn").addEventListener("click", () => loadChart
 attachGlassLighting();
 applyPalette(0);
 loadCharts();
+fetchLiveRadioStations(); // Pre-load radio stations silently in the background
