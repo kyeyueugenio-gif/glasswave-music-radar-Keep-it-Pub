@@ -15,60 +15,34 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Hidden SVG Filters for Apple Liquid Glass & Word Refraction -->
+  <!-- Gentle Optical Glass Filter (used only on glass aura/surface, never blurs readable text) -->
   <svg class="svg-filters" aria-hidden="true">
     <defs>
-      <!-- Optical Liquid Word Refraction + Chromatic Dispersion -->
-      <filter id="word-refraction" x="-15%" y="-25%" width="130%" height="150%" color-interpolation-filters="sRGB">
+      <filter id="soft-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
         <feTurbulence
           id="turb-text"
           type="fractalNoise"
-          baseFrequency="0.015 0.045"
+          baseFrequency="0.008 0.015"
           numOctaves="2"
-          seed="7"
+          seed="5"
           result="noise"
         />
-        <feGaussianBlur in="noise" stdDeviation="1.2" result="smoothNoise" />
+        <feGaussianBlur in="noise" stdDeviation="2.5" result="smoothNoise" />
         <feDisplacementMap
           id="disp-text"
           in="SourceGraphic"
           in2="smoothNoise"
-          scale="5"
+          scale="4"
           xChannelSelector="R"
           yChannelSelector="G"
-          result="warped"
         />
-        <!-- Subtle prism RGB channel shift for glass edge refraction -->
-        <feOffset in="warped" dx="1.4" dy="-0.5" result="rShift" />
-        <feColorMatrix
-          in="rShift"
-          type="matrix"
-          values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.85 0"
-          result="redChannel"
-        />
-        <feOffset in="warped" dx="-1.4" dy="0.5" result="bShift" />
-        <feColorMatrix
-          in="bShift"
-          type="matrix"
-          values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 0.85 0"
-          result="blueChannel"
-        />
-        <feColorMatrix
-          in="warped"
-          type="matrix"
-          values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 0.95 0"
-          result="greenChannel"
-        />
-        <feBlend in="redChannel" in2="greenChannel" mode="screen" result="rg" />
-        <feBlend in="rg" in2="blueChannel" mode="screen" result="chromatic" />
       </filter>
 
-      <!-- Liquid Surface Distortion Filter -->
       <filter id="liquid-surface" x="-10%" y="-10%" width="120%" height="120%">
         <feTurbulence
           id="turb-surface"
           type="turbulence"
-          baseFrequency="0.012 0.018"
+          baseFrequency="0.01 0.014"
           numOctaves="2"
           seed="3"
           result="wave"
@@ -77,7 +51,7 @@
           id="disp-surface"
           in="SourceGraphic"
           in2="wave"
-          scale="8"
+          scale="5"
           xChannelSelector="R"
           yChannelSelector="B"
         />
@@ -85,7 +59,7 @@
     </defs>
   </svg>
 
-  <!-- Dynamic Material Expressive Mesh Backdrop -->
+  <!-- Dynamic Material Expressive Ambient Mesh -->
   <div class="ambient-canvas" aria-hidden="true">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -96,16 +70,15 @@
   <!-- Top Liquid Glass Navigation Bar -->
   <header class="glass-nav liquid-card">
     <div class="brand">
-      <div class="brand-shape" aria-hidden="true">
+      <div class="brand-shape expressive-flower" aria-hidden="true">
         <span>♪</span>
       </div>
       <div>
-        <span class="brand-title refract-word">MuzikiGlass</span>
+        <span class="brand-title glass-text">MuzikiGlass</span>
         <span class="brand-sub">UGANDA × GLOBAL PULSE</span>
       </div>
     </div>
 
-    <!-- Search Capsule -->
     <form id="search-form" class="search-capsule">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="7"></circle>
@@ -114,41 +87,55 @@
       <input
         id="search-input"
         type="search"
-        placeholder="Search Eddy Kenzo, Joshua Baraka, Burna Boy, Taylor Swift..."
+        placeholder="Search Eddy Kenzo, Joshua Baraka, Burna Boy, Tyla..."
         autocomplete="off"
       />
       <button type="submit" class="btn-expressive">Explore</button>
     </form>
 
-    <!-- Dynamic Controls -->
     <div class="nav-controls">
-      <label class="refract-slider-wrap" title="Adjust Liquid Refraction">
-        <span>Refraction</span>
-        <input id="refraction-range" type="range" min="0" max="14" value="5" />
+      <label class="refract-slider-wrap" title="Adjust Liquid Glass Shimmer">
+        <span>Glass</span>
+        <input id="refraction-range" type="range" min="0" max="10" value="4" />
       </label>
       <button id="theme-cycle-btn" class="pill-btn" title="Shift Material Expressive Palette">
-        ✦ Dynamic Theme
+        ✦ Morph Theme
       </button>
     </div>
   </header>
 
   <main class="app-shell">
-    <!-- Hero Section with Liquid Refracted Typography -->
+    <!-- Hero Stage: Crisp Glass Typography + Material Expressive Tonal Cards -->
     <section class="hero-stage liquid-card">
       <div class="hero-content">
-        <div class="live-badge">
-          <span class="pulse-dot"></span>
-          <span id="live-status-text">LIVE CHARTS • KAMPALA TO THE WORLD</span>
+        <div class="hero-top-row">
+          <div class="live-badge">
+            <span class="pulse-dot"></span>
+            <span id="live-status-text">LIVE CHARTS • KAMPALA TO THE WORLD</span>
+          </div>
+
+          <!-- Live Material 3 Expressive Color Tokens HUD -->
+          <div class="expressive-tokens-hud" title="Live Material 3 Expressive Color Tokens">
+            <span class="token-label">M3 EXPRESSIVE</span>
+            <span class="token-dot t-primary"></span>
+            <span class="token-dot t-secondary"></span>
+            <span class="token-dot t-tertiary"></span>
+          </div>
         </div>
 
         <h1 class="hero-headline">
-          Feel the <span class="refract-word hero-accent" data-text="Liquid Sound">Liquid Sound</span><br />
-          of <span class="refract-word" data-text="Uganda & Global">Uganda & Global</span> Charts.
+          Feel the
+          <span class="glass-accent-wrap">
+            <span class="glass-accent-aura" aria-hidden="true">Liquid Sound</span>
+            <span class="glass-accent-text">Liquid Sound</span>
+          </span>
+          <br />
+          of Uganda &amp; Global Charts.
         </h1>
 
         <p class="hero-copy">
-          Powered by an adaptive <strong>Material Expressive Engine</strong> wrapped in specular
-          <strong>Apple Liquid Glass</strong>. Every track reshapes the atmosphere, light refraction, and color tokens in real time.
+          An adaptive <strong>Material 3 Expressive Engine</strong> layered inside
+          <strong>Apple Liquid Glass</strong>. Every track dynamically reshapes tonal containers, organic shapes, and ambient glass light.
         </p>
 
         <!-- Region & Expressive Filter Chips -->
@@ -160,52 +147,55 @@
           </div>
 
           <div class="genre-chips" id="genre-chips">
-            <button class="chip active" data-genre="trending">🔥 Trending Now</button>
-            <button class="chip" data-genre="ugaflow">🥁 Ugaflow & Afrobeat</button>
-            <button class="chip" data-genre="amapiano">🎹 Amapiano & Dance</button>
-            <button class="chip" data-genre="globalpop">⚡ Global Pop & R&B</button>
+            <button class="chip active" data-genre="trending">🔥 Trending</button>
+            <button class="chip" data-genre="ugaflow">🥁 Ugaflow &amp; Afrobeat</button>
+            <button class="chip" data-genre="amapiano">🎹 Amapiano</button>
+            <button class="chip" data-genre="globalpop">⚡ Global Pop</button>
             <button class="chip" data-genre="hiphop">🎤 Hip-Hop</button>
           </div>
         </div>
       </div>
 
-      <!-- Featured Expressive Spotlight Card -->
-      <aside class="spotlight-card liquid-card" id="spotlight-card">
+      <!-- Featured Material Expressive Spotlight Card -->
+      <aside class="spotlight-card tonal-expressive-card" id="spotlight-card">
         <div class="spotlight-header">
-          <span class="mono-tag">TOP PULSE</span>
-          <span class="mono-tag" id="spotlight-region">UGANDA</span>
+          <span class="m3-badge">★ TOP PULSE</span>
+          <span class="m3-badge tonal" id="spotlight-region">UGANDA</span>
         </div>
+
         <div class="spotlight-art-wrap">
+          <div class="expressive-scallop-ring" aria-hidden="true"></div>
           <img id="spotlight-img" src="" alt="Featured Track Art" />
-          <div class="spotlight-glass-ring"></div>
         </div>
+
         <div class="spotlight-meta">
-          <h2 id="spotlight-title" class="refract-word">Loading...</h2>
+          <h2 id="spotlight-title">Loading...</h2>
           <p id="spotlight-artist">Fetching live tracks</p>
         </div>
+
         <button id="spotlight-play-btn" class="morph-play-btn">
-          <span class="play-icon">▶</span>
+          <span>▶</span>
           <span>Play Preview</span>
         </button>
       </aside>
     </section>
 
-    <!-- Chart Stats Bar -->
+    <!-- Material Expressive Tonal Stats Bar -->
     <section class="stats-strip">
-      <div class="stat-pill liquid-card">
-        <span class="stat-label">TRACKS LOADED</span>
-        <strong id="stat-count" class="stat-val refract-word">0</strong>
+      <div class="stat-pill tonal-card">
+        <span class="stat-label">TRACKS LIVE</span>
+        <strong id="stat-count" class="stat-val">0</strong>
       </div>
-      <div class="stat-pill liquid-card">
-        <span class="stat-label">ENGINE PALETTE</span>
+      <div class="stat-pill tonal-card">
+        <span class="stat-label">M3 PALETTE</span>
         <strong id="stat-palette" class="stat-val">Kampala Sunset</strong>
       </div>
-      <div class="stat-pill liquid-card">
-        <span class="stat-label">AUDIO STATUS</span>
-        <strong id="stat-audio" class="stat-val">Standby</strong>
+      <div class="stat-pill tonal-card">
+        <span class="stat-label">AUDIO ENGINE</span>
+        <strong id="stat-audio" class="stat-val">Ready</strong>
       </div>
-      <div class="stat-pill liquid-card">
-        <span class="stat-label">SORT BY</span>
+      <div class="stat-pill tonal-card">
+        <span class="stat-label">SORT ORDER</span>
         <select id="sort-select" class="glass-select">
           <option value="rank">Chart Rank</option>
           <option value="title">Title (A–Z)</option>
@@ -217,33 +207,26 @@
     <!-- Tracks Grid -->
     <section class="tracks-section">
       <div class="section-head">
-        <h2 class="section-title refract-word" id="grid-heading">Trending Across Uganda & The Globe</h2>
-        <button id="refresh-btn" class="pill-btn">↻ Sync Live Charts</button>
+        <h2 class="section-title" id="grid-heading">Trending Across Uganda &amp; The Globe</h2>
+        <button id="refresh-btn" class="pill-btn">↻ Sync Charts</button>
       </div>
 
       <div id="tracks-grid" class="tracks-grid">
-        <!-- Dynamically injected track cards -->
+        <!-- Dynamically injected expressive track cards -->
       </div>
     </section>
   </main>
 
-  <!-- Floating Apple Liquid Glass Dynamic Dock Player -->
+  <!-- Compact Slim Floating Apple Liquid Glass Mini-Player -->
   <footer class="player-dock liquid-card" id="player-dock">
-    <div class="dock-left">
-      <div class="dock-art-morph" id="dock-art-wrap">
-        <img id="dock-img" src="" alt="Now Playing" />
-      </div>
-      <div class="dock-info">
-        <div id="dock-title" class="dock-title refract-word">Select a track</div>
-        <div id="dock-artist" class="dock-artist">Tap any song to trigger dynamic glass</div>
-      </div>
+    <div class="dock-art-morph" id="dock-art-wrap">
+      <img id="dock-img" src="" alt="Now Playing" />
     </div>
 
-    <div class="dock-center">
-      <div class="dock-controls">
-        <button id="prev-btn" class="icon-btn" aria-label="Previous track">⏮</button>
-        <button id="play-pause-btn" class="morph-play-circle" aria-label="Play or pause">▶</button>
-        <button id="next-btn" class="icon-btn" aria-label="Next track">⏭</button>
+    <div class="dock-meta-col">
+      <div class="dock-text-row">
+        <span id="dock-title" class="dock-title">Pick a track</span>
+        <span id="dock-artist" class="dock-artist">Tap any card to play</span>
       </div>
       <div class="progress-wrap">
         <span id="current-time" class="mono-time">0:00</span>
@@ -252,15 +235,18 @@
       </div>
     </div>
 
-    <div class="dock-right">
+    <div class="dock-actions">
       <div class="visualizer" id="visualizer" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span>
       </div>
-      <input id="volume-bar" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
+      <button id="prev-btn" class="icon-btn" aria-label="Previous track">⏮</button>
+      <button id="play-pause-btn" class="morph-play-circle" aria-label="Play or pause">▶</button>
+      <button id="next-btn" class="icon-btn" aria-label="Next track">⏭</button>
+      <input id="volume-bar" class="volume-mini" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
     </div>
   </footer>
 
-  <audio id="audio-player" crossorigin="anonymous"></audio>
+  <audio id="audio-player"></audio>
   <script src="app.js"></script>
 </body>
 </html>
