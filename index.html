@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MuzikiGlass — iOS Liquid Glass + Ugandan & Global Music</title>
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
@@ -22,7 +22,7 @@
 
       <form id="search-form" class="search-capsule">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-        <input id="search-input" type="search" placeholder="Search Ugandan FM, artists, or full tracks..." autocomplete="off" />
+        <input id="search-input" type="search" placeholder="Search Ugandan FM, artists, or trending hits..." autocomplete="off" />
         <button type="submit" class="btn-expressive">Search</button>
       </form>
 
@@ -53,7 +53,7 @@
       </div>
 
       <div class="genre-chips" id="genre-chips">
-        <button class="chip active" data-genre="trending">Latest 2025/26</button>
+        <button class="chip active" data-genre="trending">Trending Now</button>
         <button class="chip" data-genre="ugaflow">Ugaflow &amp; Afrobeat</button>
         <button class="chip" data-genre="amapiano">Amapiano</button>
         <button class="chip" data-genre="globalpop">Global Pop</button>
@@ -66,25 +66,25 @@
     <section class="hero-sheet">
       <div class="hero-content">
         <div class="hero-top-row">
-          <div class="live-badge"><span class="pulse-dot"></span><span id="live-status-text">KAMPALA TO THE WORLD • FULL STREAM</span></div>
+          <div class="live-badge"><span class="pulse-dot"></span><span id="live-status-text">KAMPALA TO THE WORLD • TRENDING CHARTS</span></div>
           <div class="expressive-tokens-hud"><span class="token-label">M3 EXPRESSIVE</span><span class="token-dot t-primary"></span><span class="token-dot t-secondary"></span></div>
         </div>
         <h1 class="hero-headline">Feel the <span class="accent-headline">Liquid Sound</span><br />of Uganda &amp; Global Radio.</h1>
-        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>full-length tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
+        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>official trending tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
       </div>
 
       <aside class="spotlight-card" id="spotlight-card">
         <div class="spotlight-header"><span class="m3-badge">★ FEATURED</span><span class="m3-badge tonal" id="spotlight-region">UGANDA</span></div>
         <div class="spotlight-art-wrap"><img id="spotlight-img" src="" alt="Featured Track" /></div>
         <div class="spotlight-meta"><h2 id="spotlight-title">Loading...</h2><p id="spotlight-artist">Syncing tracks</p></div>
-        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Full Track</button>
+        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Now</button>
       </aside>
     </section>
 
     <!-- Country-Categorized FM Radio -->
     <section class="content-section sheet-panel" id="radio-section">
       <div class="section-head">
-        <div><h2 class="section-title" id="radio-heading">Live FM • Uganda</h2><p class="section-sub" id="radio-status">Loading live FM streams...</p></div>
+        <div><h2 class="section-title" id="radio-heading">Live FM • 🇺🇬 Uganda</h2><p class="section-sub" id="radio-status">Loading live FM streams...</p></div>
         <button id="refresh-radio-btn" class="pill-btn">↻ Refresh FM</button>
       </div>
       <div class="country-pills" id="radio-country-pills" role="tablist">
@@ -103,11 +103,11 @@
     <!-- Fresh Drops -->
     <section class="content-section sheet-panel" id="tracks-section">
       <div class="section-head">
-        <div><h2 class="section-title" id="grid-heading">Fresh Drops</h2><p class="section-sub">Full-length Ugandan &amp; Global tracks</p></div>
+        <div><h2 class="section-title" id="grid-heading">Trending Charts</h2><p class="section-sub">Official Ugandan &amp; Global hits</p></div>
         <div class="section-tools">
           <select id="sort-select" class="glass-select" aria-label="Sort Tracks">
+            <option value="rank">Chart Rank</option>
             <option value="newest">Newest First</option>
-            <option value="rank">Chart Mix</option>
             <option value="title">Title (A–Z)</option>
             <option value="artist">Artist (A–Z)</option>
           </select>
@@ -118,13 +118,13 @@
     </section>
   </main>
 
-  <!-- 2. Floating iOS Liquid Glass Mini-Player -->
-  <footer class="player-dock liquid-glass-surface" id="player-dock" title="Tap to open Now Playing">
+  <!-- 2. Floating iOS Liquid Glass Mini-Player (Tap or Swipe Up to Expand) -->
+  <footer class="player-dock liquid-glass-surface" id="player-dock" title="Tap or swipe up to expand Now Playing & Lyrics">
     <div class="dock-art-morph" id="dock-art-wrap">
       <img id="dock-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f2f2f7'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fa243c' font-size='26'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" alt="Now Playing" />
     </div>
     <div class="dock-meta-col">
-      <div class="dock-text-row"><span id="dock-title" class="dock-title">Select a Track or FM</span><span id="dock-artist" class="dock-artist">Tap to expand player</span></div>
+      <div class="dock-text-row"><span id="dock-title" class="dock-title">Select a Track or FM</span><span id="dock-artist" class="dock-artist">Tap to expand player &amp; lyrics</span></div>
       <div class="wavy-row">
         <span id="current-time" class="mono-time">0:00</span>
         <div id="dock-scrubber" class="wavy-scrubber sm" role="slider" tabindex="0" aria-label="Seek audio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -141,13 +141,16 @@
       <button id="prev-btn" class="transport-pill-btn sm" aria-label="Previous track"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4.5" y="5.5" width="2.4" height="13" rx="1.2"/><path d="M18.3 6.2a1.3 1.3 0 0 0-2-.9l-8 5.4a1.3 1.3 0 0 0 0 2.2l8 5.4a1.3 1.3 0 0 0 2-1.1V6.2Z"/></svg></button>
       <button id="play-pause-btn" class="focal-play-btn sm" aria-label="Play"><svg class="glyph-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7.8 5.3a1.4 1.4 0 0 1 2.1-1.2l9.7 5.7a1.4 1.4 0 0 1 0 2.4l-9.7 5.7a1.4 1.4 0 0 1-2.1-1.2V5.3Z"/></svg><svg class="glyph-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5.2" width="4" height="13.6" rx="1.6"/><rect x="13.5" y="5.2" width="4" height="13.6" rx="1.6"/></svg></button>
       <button id="next-btn" class="transport-pill-btn sm" aria-label="Next track"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="17.1" y="5.5" width="2.4" height="13" rx="1.2"/><path d="M5.7 6.2a1.3 1.3 0 0 1 2-.9l8 5.4a1.3 1.3 0 0 1 0 2.2l-8 5.4a1.3 1.3 0 0 1-2-1.1V6.2Z"/></svg></button>
+      <button id="dock-expand-btn" class="transport-pill-btn sm" aria-label="Expand Now Playing & Lyrics" title="Expand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+      </button>
     </div>
   </footer>
 
   <!-- 3. Expanded Liquid Glass 3-Slide Sheet -->
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
     <section class="now-playing-tray liquid-glass-surface" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
-      <header class="tray-top">
+      <header class="tray-top" id="tray-drag-bar">
         <div class="tray-slide-pills liquid-glass-surface" id="tray-segmented" role="tablist">
           <span class="glass-lens-thumb" id="tray-lens" aria-hidden="true"></span>
           <button class="tray-dot active" data-slide="0">Now Playing</button>
@@ -156,13 +159,14 @@
         </div>
         <div class="tray-header-actions">
           <a id="tray-ytm-link" class="pill-btn small-pill" href="https://music.youtube.com" target="_blank" rel="noopener">YT Music ↗</a>
-          <button id="tray-close-btn" class="icon-close-btn" aria-label="Close Tray">✕</button>
+          <button id="tray-close-btn" class="icon-close-btn" aria-label="Minimize Player" title="Minimize">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </header>
 
       <div class="tray-carousel" id="tray-carousel">
         <div class="tray-slide" id="slide-player">
-          <!-- Permanent 200x200 YT Player host (never display:none) -->
           <div class="tray-media-box">
             <img id="tray-art" src="" alt="Album Cover" />
             <div id="yt-player-wrap" class="yt-player-wrap yt-inactive"><div id="yt-player-mount"></div></div>
@@ -170,7 +174,11 @@
           <div class="tray-song-info">
             <div class="tray-title-row">
               <div class="tray-title-text"><h2 id="tray-title">Select a Track</h2><p id="tray-artist">Uganda &amp; Global Music</p></div>
-              <div class="tray-quick-icons"><button id="tray-like-btn" class="fav-btn">♡</button><button id="tray-share-btn" class="fav-btn">⤴</button></div>
+              <div class="tray-quick-icons">
+                <button id="tray-open-lyrics-btn" class="fav-btn" title="View Synced Lyrics">🎤</button>
+                <button id="tray-like-btn" class="fav-btn" title="Favorite">♡</button>
+                <button id="tray-share-btn" class="fav-btn" title="Share">⤴</button>
+              </div>
             </div>
             <div class="tray-meta-badges"><span class="m3-badge tonal" id="tray-region-badge">GLOBAL</span><span class="m3-badge tonal" id="tray-year-badge">2025</span><span class="m3-badge tonal" id="tray-genre-badge">Music</span></div>
           </div>
@@ -231,9 +239,9 @@
   <div class="tray-backdrop" id="yt-modal-backdrop" aria-hidden="true">
     <div class="yt-modal liquid-glass-surface" role="dialog" aria-modal="true" aria-label="YouTube Music API Setup">
       <div class="tray-header-row"><span class="m3-badge">▶ YOUTUBE MUSIC API</span><button id="yt-modal-close" class="icon-close-btn">✕</button></div>
-      <p class="modal-desc">Connect a free <strong>YouTube Data API v3</strong> key for full-length <strong>Uganda</strong> &amp; <strong>Global</strong> YouTube Music charts. Saved only in your browser.</p>
+      <p class="modal-desc">Connect a free <strong>YouTube Data API v3</strong> key for 100+ live <strong>Uganda, Nigeria, UK &amp; USA</strong> official trending music videos (`chart=mostPopular`). Saved only in your browser.</p>
       <input id="yt-api-key-input" class="modal-input" type="password" placeholder="Paste YouTube Data API v3 Key (AIza...)" />
-      <div class="modal-actions"><button id="yt-save-btn" class="btn-expressive">Save &amp; Sync</button><button id="yt-clear-btn" class="pill-btn">Use Audius Full Sync</button></div>
+      <div class="modal-actions"><button id="yt-save-btn" class="btn-expressive">Save &amp; Sync</button><button id="yt-clear-btn" class="pill-btn">Use Free Trending</button></div>
     </div>
   </div>
 
@@ -241,6 +249,6 @@
   <audio id="audio-player" preload="none"></audio>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
