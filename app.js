@@ -1,18 +1,53 @@
 /* ==========================================================================
    MUZIKIGLASS — Live Global & Ugandan Music Engine
-   Fuses Apple Liquid Glass Refraction + Material 3 Expressive Dynamic Tokens
+   
    ========================================================================== */
 
-// Material Expressive Dynamic Palettes
+// Material 3 Expressive Dynamic Palettes with Tonal Containers
 const EXPRESSIVE_PALETTES = [
-  { name: "Kampala Sunset", primary: "#ff6b3d", secondary: "#00d4ff", tertiary: "#d946ef" },
-  { name: "Nile Emerald", primary: "#22e58a", secondary: "#38bdf8", tertiary: "#a855f7" },
-  { name: "Afrobeat Gold", primary: "#facc15", secondary: "#fb7185", tertiary: "#6366f1" },
-  { name: "Global Neon", primary: "#60a5fa", secondary: "#f472b6", tertiary: "#34d399" },
-  { name: "Pearl Crimson", primary: "#fb7185", secondary: "#fbbf24", tertiary: "#2dd4bf" },
+  {
+    name: "Kampala Sunset",
+    primary: "#ff7a45",
+    primaryContainer: "rgba(255, 122, 69, 0.24)",
+    secondary: "#38bdf8",
+    secondaryContainer: "rgba(56, 189, 248, 0.2)",
+    tertiary: "#e879f9",
+  },
+  {
+    name: "Nile Emerald",
+    primary: "#34d399",
+    primaryContainer: "rgba(52, 211, 153, 0.22)",
+    secondary: "#60a5fa",
+    secondaryContainer: "rgba(96, 165, 250, 0.2)",
+    tertiary: "#c084fc",
+  },
+  {
+    name: "Afrobeat Gold",
+    primary: "#fbbf24",
+    primaryContainer: "rgba(251, 191, 36, 0.24)",
+    secondary: "#fb7185",
+    secondaryContainer: "rgba(251, 113, 133, 0.2)",
+    tertiary: "#818cf8",
+  },
+  {
+    name: "Global Neon",
+    primary: "#60a5fa",
+    primaryContainer: "rgba(96, 165, 250, 0.24)",
+    secondary: "#f472b6",
+    secondaryContainer: "rgba(244, 114, 182, 0.2)",
+    tertiary: "#2dd4bf",
+  },
+  {
+    name: "Pearl Crimson",
+    primary: "#fb7185",
+    primaryContainer: "rgba(251, 113, 133, 0.24)",
+    secondary: "#fcd34d",
+    secondaryContainer: "rgba(252, 211, 77, 0.2)",
+    tertiary: "#38bdf8",
+  },
 ];
 
-// Curated Offline/Fallback Ugandan & Global Hits (guaranteed instant load)
+// Curated Offline/Fallback Ugandan & Global Hits
 const FALLBACK_TRACKS = [
   {
     id: "ug-1",
@@ -52,7 +87,7 @@ const FALLBACK_TRACKS = [
     title: "Water",
     artist: "Tyla",
     album: "TYLA",
-    genre: "Amapiano & Dance",
+    genre: "Amapiano",
     region: "global",
     artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/aa/52/4d/aa524dff-952e-d77e-00f7-e7d06b5c1a49/196871319959.jpg/600x600bb.jpg",
     previewUrl: "",
@@ -63,7 +98,7 @@ const FALLBACK_TRACKS = [
     title: "City Boys",
     artist: "Burna Boy",
     album: "I Told Them...",
-    genre: "Ugaflow & Afrobeat",
+    genre: "Afrobeats",
     region: "global",
     artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/67/40/f4/6740f40f-c7b2-1fa1-cc5f-d0e1a4a217a1/075679678799.jpg/600x600bb.jpg",
     previewUrl: "",
@@ -74,7 +109,7 @@ const FALLBACK_TRACKS = [
     title: "Die With A Smile",
     artist: "Lady Gaga & Bruno Mars",
     album: "Single",
-    genre: "Global Pop & R&B",
+    genre: "Global Pop",
     region: "global",
     artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/55/82/1155825e-59e3-8c53-efbd-0f1940376d09/24UMGIM84979.rgb.jpg/600x600bb.jpg",
     previewUrl: "",
@@ -106,7 +141,6 @@ const QUERY_PRESETS = {
   },
 };
 
-// App State
 const state = {
   tracks: [],
   filteredTracks: [],
@@ -119,7 +153,6 @@ const state = {
   paletteIdx: 0,
 };
 
-// DOM References
 const tracksGrid = document.getElementById("tracks-grid");
 const audioPlayer = document.getElementById("audio-player");
 const playPauseBtn = document.getElementById("play-pause-btn");
@@ -130,7 +163,7 @@ const visualizer = document.getElementById("visualizer");
 const dockArtWrap = document.getElementById("dock-art-wrap");
 
 /* ==========================================================================
-   1. Apple Liquid Glass Specular Pointer + Dynamic SVG Refraction
+   1. Apple Liquid Glass Specular Pointer + Gentle Optical Aura
    ========================================================================== */
 function attachGlassLighting() {
   document.addEventListener("pointermove", (e) => {
@@ -144,23 +177,21 @@ function attachGlassLighting() {
     });
   });
 
-  // Live refraction slider
   const refractionRange = document.getElementById("refraction-range");
   const dispText = document.getElementById("disp-text");
   const dispSurface = document.getElementById("disp-surface");
   refractionRange.addEventListener("input", (e) => {
     const val = Number(e.target.value);
     dispText.setAttribute("scale", val);
-    dispSurface.setAttribute("scale", val * 1.4);
+    dispSurface.setAttribute("scale", val * 1.2);
   });
 
-  // Subtle ambient liquid wave animation on SVG turbulence
   let phase = 0;
   function animateRefraction() {
-    phase += 0.018;
+    phase += 0.015;
     const turbText = document.getElementById("turb-text");
-    const freqX = (0.013 + Math.sin(phase) * 0.003).toFixed(4);
-    const freqY = (0.042 + Math.cos(phase * 0.8) * 0.006).toFixed(4);
+    const freqX = (0.008 + Math.sin(phase) * 0.002).toFixed(4);
+    const freqY = (0.015 + Math.cos(phase * 0.8) * 0.003).toFixed(4);
     turbText.setAttribute("baseFrequency", `${freqX} ${freqY}`);
     requestAnimationFrame(animateRefraction);
   }
@@ -168,14 +199,16 @@ function attachGlassLighting() {
 }
 
 /* ==========================================================================
-   2. Material Expressive Dynamic Color Engine
+   2. Material 3 Expressive Tonal Palette Engine
    ========================================================================== */
 function applyPalette(index) {
   state.paletteIdx = index % EXPRESSIVE_PALETTES.length;
   const p = EXPRESSIVE_PALETTES[state.paletteIdx];
   const root = document.documentElement;
   root.style.setProperty("--md-primary", p.primary);
+  root.style.setProperty("--md-primary-container", p.primaryContainer);
   root.style.setProperty("--md-secondary", p.secondary);
+  root.style.setProperty("--md-secondary-container", p.secondaryContainer);
   root.style.setProperty("--md-tertiary", p.tertiary);
   document.getElementById("stat-palette").textContent = p.name;
 }
@@ -209,7 +242,7 @@ async function fetchArtistSongs(term, regionTag) {
 async function loadCharts() {
   const statusEl = document.getElementById("live-status-text");
   statusEl.textContent = "SYNCING LIVE UGANDA & GLOBAL CHARTS...";
-  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:24px;border-radius:24px;">Loading live audio waves from Kampala & Global charts...</div>`;
+  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">Loading live audio waves from Kampala &amp; Global charts...</div>`;
 
   try {
     let fetched = [];
@@ -232,7 +265,6 @@ async function loadCharts() {
       });
     }
 
-    // Deduplicate by track ID and interleave Uganda & Global tracks
     const seen = new Set();
     const unique = fetched.filter((t) => {
       if (seen.has(t.id)) return false;
@@ -297,7 +329,7 @@ function renderGrid(list) {
   tracksGrid.innerHTML = "";
 
   if (!list.length) {
-    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:24px;border-radius:24px;">No tracks matched your filter. Try switching to "All Waves".</div>`;
+    tracksGrid.innerHTML = `<div class="liquid-card" style="padding:22px;border-radius:24px;">No tracks matched your filter. Try switching to "All Waves".</div>`;
     return;
   }
 
@@ -309,7 +341,7 @@ function renderGrid(list) {
       state.isPlaying;
 
     card.className = `track-card liquid-card${isPlayingThis ? " playing" : ""}`;
-    card.style.animationDelay = `${Math.min(idx * 35, 350)}ms`;
+    card.style.animationDelay = `${Math.min(idx * 30, 320)}ms`;
 
     card.innerHTML = `
       <div class="track-cover-wrap">
@@ -334,29 +366,28 @@ function renderGrid(list) {
 }
 
 /* ==========================================================================
-   5. Audio Engine + Dynamic Theme Shifting per Song
+   5. Audio Engine + Dynamic M3 Palette Morph per Song
    ========================================================================== */
 function playTrackAtIndex(idx) {
   const track = state.filteredTracks[idx];
   if (!track) return;
 
-  // Clicking the same currently playing track toggles pause/play
   if (state.currentIndex === idx && state.isPlaying) {
     audioPlayer.pause();
     state.isPlaying = false;
     updatePlayerUI();
+    renderGrid(state.filteredTracks);
     return;
   }
 
   state.currentIndex = idx;
 
-  // Dynamically shift Material Expressive palette per track
   const hash = track.title.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
   applyPalette(hash % EXPRESSIVE_PALETTES.length);
 
   document.getElementById("dock-img").src = track.artwork;
   document.getElementById("dock-title").textContent = track.title;
-  document.getElementById("dock-artist").textContent = `${track.artist} • ${track.region.toUpperCase()}`;
+  document.getElementById("dock-artist").textContent = track.artist;
 
   if (track.previewUrl) {
     audioPlayer.removeAttribute("crossorigin");
@@ -364,10 +395,10 @@ function playTrackAtIndex(idx) {
     audioPlayer.volume = Number(volumeBar.value);
     audioPlayer.play().catch(() => {});
     state.isPlaying = true;
-    document.getElementById("stat-audio").textContent = "Playing 30s Preview";
+    document.getElementById("stat-audio").textContent = "Playing 30s";
   } else {
     state.isPlaying = false;
-    document.getElementById("stat-audio").textContent = "No Audio Preview";
+    document.getElementById("stat-audio").textContent = "No Preview";
   }
 
   updatePlayerUI();
