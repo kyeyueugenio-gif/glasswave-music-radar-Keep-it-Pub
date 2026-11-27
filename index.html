@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MuzikiGlass — Live Ugandan FM & Global Music</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>MuzikiGlass — Apple Music Light Mode + 70+ Live FM</title>
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
@@ -32,12 +32,20 @@
       <div class="nav-actions">
         <button id="yt-api-btn" class="pill-btn yt-pill" title="Connect YouTube Music API">YT API</button>
         <button id="theme-cycle-btn" class="pill-btn" title="Cycle Accent Color">✦ Color</button>
-        <button id="appearance-toggle-btn" class="pill-btn" title="Toggle Light / Dark Mode">☾ Dark</button>
+
+        <!-- iOS 26 Refracted Liquid Glass Light/Dark Switch -->
+        <button id="appearance-toggle-btn" class="liquid-switch" role="switch" aria-checked="false" aria-label="Toggle Dark Mode" title="Light / Dark Mode">
+          <span class="switch-icon sun">☀</span>
+          <span class="switch-icon moon">☾</span>
+          <span class="switch-lens" aria-hidden="true"></span>
+        </button>
       </div>
     </div>
 
     <div class="nav-filter-row">
-      <div class="segmented-glass" role="tablist" aria-label="Content Filter">
+      <!-- Refracted Liquid Glass Sliding Segmented Bar -->
+      <div class="segmented-glass" id="region-segmented" role="tablist" aria-label="Content Filter">
+        <span class="glass-lens-thumb" id="region-lens" aria-hidden="true"></span>
         <button class="seg-btn active" data-region="all">All</button>
         <button class="seg-btn" data-region="radio">FM Radio (<span id="radio-count">0</span>)</button>
         <button class="seg-btn" data-region="songs">Latest Songs</button>
@@ -57,7 +65,7 @@
   </header>
 
   <main class="app-shell">
-    <!-- Hero Sheet -->
+    <!-- Grouped Sheet Hero -->
     <section class="hero-sheet">
       <div class="hero-content">
         <div class="hero-top-row">
@@ -100,7 +108,7 @@
     <section class="content-section sheet-panel" id="radio-section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Live Ugandan FM &amp; Radio</h2>
+          <h2 class="section-title">Live Ugandan FM</h2>
           <p class="section-sub" id="radio-status">Loading live FM streams...</p>
         </div>
         <button id="refresh-radio-btn" class="pill-btn">↻ Refresh FM</button>
@@ -182,7 +190,8 @@
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
     <section class="now-playing-tray" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
       <header class="tray-top">
-        <div class="tray-slide-pills" role="tablist" aria-label="Tray Views">
+        <div class="tray-slide-pills" id="tray-segmented" role="tablist" aria-label="Tray Views">
+          <span class="glass-lens-thumb" id="tray-lens" aria-hidden="true"></span>
           <button class="tray-dot active" data-slide="0">Now Playing</button>
           <button class="tray-dot" data-slide="1">Up Next</button>
           <button class="tray-dot" data-slide="2">Lyrics</button>
@@ -324,6 +333,6 @@
 
   <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
   <audio id="audio-player" preload="none"></audio>
-  <script src="app.js"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
