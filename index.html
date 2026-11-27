@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MuzikiGlass — Latest Uganda & Global Music + Radio</title>
+  <title>MuzikiGlass — Uganda & Global Music + Live FM</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- GPU-Accelerated Material Expressive Ambient Mesh -->
+  <!-- Ambient Mesh -->
   <div class="ambient-canvas" aria-hidden="true">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -81,7 +81,7 @@
         </h1>
 
         <p class="hero-copy">
-          Stream fresh <strong>Ugandan &amp; Global music</strong>, tune into <strong>Live FM Radio</strong>, and swipe inside the mini-player tray for <strong>Up Next</strong> &amp; <strong>Synced Lyrics</strong>.
+          Stream fresh <strong>Ugandan &amp; Global music</strong>, tune into <strong>Live FM Radio</strong>, and swipe inside the player tray for <strong>Up Next</strong> &amp; <strong>Synced Lyrics</strong>.
         </p>
 
         <div class="control-deck">
@@ -103,7 +103,7 @@
         </div>
       </div>
 
-      <!-- Featured Material Expressive Spotlight Card -->
+      <!-- Featured Spotlight Card -->
       <aside class="spotlight-card tonal-expressive-card" id="spotlight-card">
         <div class="spotlight-header">
           <span class="m3-badge">★ FRESH PULSE</span>
@@ -127,7 +127,7 @@
       </aside>
     </section>
 
-    <!-- Material Expressive Tonal Stats Bar -->
+    <!-- Stats Bar -->
     <section class="stats-strip">
       <div class="stat-pill tonal-card">
         <span class="stat-label">SOURCE ENGINE</span>
@@ -164,15 +164,15 @@
   </main>
 
   <!-- Slim Compact Floating Bottom Mini-Player -->
-  <footer class="player-dock liquid-card" id="player-dock" title="Tap to open compact tray">
+  <footer class="player-dock liquid-card" id="player-dock" title="Tap to open player tray">
     <div class="dock-art-morph" id="dock-art-wrap">
       <img id="dock-img" src="" alt="Now Playing" />
     </div>
 
     <div class="dock-meta-col">
       <div class="dock-text-row">
-        <span id="dock-title" class="dock-title">Pick a track or radio</span>
-        <span id="dock-artist" class="dock-artist">Tap bar for tray, Up Next &amp; Lyrics</span>
+        <span id="dock-title" class="dock-title">Select a Track</span>
+        <span id="dock-artist" class="dock-artist">Tap to open player &amp; lyrics</span>
       </div>
       <div class="progress-wrap">
         <span id="current-time" class="mono-time">0:00</span>
@@ -181,14 +181,41 @@
       </div>
     </div>
 
+    <!-- Refined Geometric Transport Controls -->
     <div class="dock-actions">
       <div class="visualizer" id="visualizer" aria-hidden="true">
         <span></span><span></span><span></span>
       </div>
-      <button id="prev-btn" class="icon-btn" aria-label="Previous track">⏮</button>
-      <button id="play-pause-btn" class="morph-play-circle" aria-label="Play or pause">▶</button>
-      <button id="next-btn" class="icon-btn" aria-label="Next track">⏭</button>
-      <span class="expand-hint" aria-hidden="true">⌃</span>
+
+      <button id="prev-btn" class="transport-pill-btn sm" aria-label="Previous track">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="4.5" y="5.5" width="2.4" height="13" rx="1.2" />
+          <path d="M18.3 6.2a1.3 1.3 0 0 0-2-.9l-8 5.4a1.3 1.3 0 0 0 0 2.2l8 5.4a1.3 1.3 0 0 0 2-1.1V6.2Z" />
+        </svg>
+      </button>
+
+      <button id="play-pause-btn" class="focal-play-btn sm" aria-label="Play">
+        <svg class="glyph-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M7.8 5.3a1.4 1.4 0 0 1 2.1-1.2l9.7 5.7a1.4 1.4 0 0 1 0 2.4l-9.7 5.7a1.4 1.4 0 0 1-2.1-1.2V5.3Z" />
+        </svg>
+        <svg class="glyph-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="6.5" y="5.2" width="4" height="13.6" rx="1.6" />
+          <rect x="13.5" y="5.2" width="4" height="13.6" rx="1.6" />
+        </svg>
+      </button>
+
+      <button id="next-btn" class="transport-pill-btn sm" aria-label="Next track">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="17.1" y="5.5" width="2.4" height="13" rx="1.2" />
+          <path d="M5.7 6.2a1.3 1.3 0 0 1 2-.9l8 5.4a1.3 1.3 0 0 1 0 2.2l-8 5.4a1.3 1.3 0 0 1-2-1.1V6.2Z" />
+        </svg>
+      </button>
+
+      <span class="expand-hint" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M6 15l6-6 6 6" />
+        </svg>
+      </span>
     </div>
   </footer>
 
@@ -197,22 +224,20 @@
        ========================================================= -->
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
     <section class="now-playing-tray liquid-card" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
-      <!-- Top Slide Switcher + Close -->
       <header class="tray-top">
         <div class="tray-slide-pills" role="tablist" aria-label="Tray Views">
-          <button class="tray-dot active" data-slide="0">♪ Player</button>
-          <button class="tray-dot" data-slide="1">☰ Up Next</button>
-          <button class="tray-dot" data-slide="2">🎤 Lyrics</button>
+          <button class="tray-dot active" data-slide="0">Now Playing</button>
+          <button class="tray-dot" data-slide="1">Up Next</button>
+          <button class="tray-dot" data-slide="2">Lyrics</button>
         </div>
         <div class="tray-header-actions">
           <a id="tray-ytm-link" class="pill-btn small-pill" href="https://music.youtube.com" target="_blank" rel="noopener">
-            ↗ YT
+            YT Music ↗
           </a>
           <button id="tray-close-btn" class="icon-close-btn" aria-label="Close Tray">✕</button>
         </div>
       </header>
 
-      <!-- Horizontal Swipe / Slide Carousel -->
       <div class="tray-carousel" id="tray-carousel">
         <!-- SLIDE 1: Compact Player -->
         <div class="tray-slide" id="slide-player">
@@ -231,12 +256,12 @@
           <div class="tray-song-info">
             <div class="tray-title-row">
               <div class="tray-title-text">
-                <h2 id="tray-title">Select a Song</h2>
+                <h2 id="tray-title">Select a Track</h2>
                 <p id="tray-artist">Uganda &amp; Global Music</p>
               </div>
               <div class="tray-quick-icons">
-                <button id="tray-like-btn" class="fav-btn" title="Save to Liked">♡</button>
-                <button id="tray-share-btn" class="fav-btn" title="Share Track">⤴</button>
+                <button id="tray-like-btn" class="fav-btn" title="Favorite">♡</button>
+                <button id="tray-share-btn" class="fav-btn" title="Share">⤴</button>
               </div>
             </div>
             <div class="tray-meta-badges">
@@ -253,18 +278,75 @@
               <span id="tray-total-time" class="mono-time">0:30</span>
             </div>
 
+            <!-- Refined Futuristic Transport Controls -->
             <div class="tray-controls-row">
-              <button id="tray-shuffle-btn" class="icon-btn" title="Shuffle">🔀</button>
-              <button id="tray-prev-btn" class="icon-btn lg" title="Previous">⏮</button>
-              <button id="tray-play-btn" class="tray-main-play" title="Play / Pause">▶</button>
-              <button id="tray-next-btn" class="icon-btn lg" title="Next">⏭</button>
-              <button id="tray-repeat-btn" class="icon-btn" title="Repeat">🔁</button>
+              <button id="tray-shuffle-btn" class="transport-pill-btn subtle" aria-label="Shuffle" title="Shuffle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+                </svg>
+              </button>
+
+              <button id="tray-prev-btn" class="transport-pill-btn md" aria-label="Previous track" title="Previous">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="4.5" y="5.5" width="2.4" height="13" rx="1.2" />
+                  <path d="M18.3 6.2a1.3 1.3 0 0 0-2-.9l-8 5.4a1.3 1.3 0 0 0 0 2.2l8 5.4a1.3 1.3 0 0 0 2-1.1V6.2Z" />
+                </svg>
+              </button>
+
+              <button id="tray-play-btn" class="focal-play-btn lg" aria-label="Play" title="Play / Pause">
+                <svg class="glyph-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M7.8 5.3a1.4 1.4 0 0 1 2.1-1.2l9.7 5.7a1.4 1.4 0 0 1 0 2.4l-9.7 5.7a1.4 1.4 0 0 1-2.1-1.2V5.3Z" />
+                </svg>
+                <svg class="glyph-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="6.5" y="5.2" width="4" height="13.6" rx="1.6" />
+                  <rect x="13.5" y="5.2" width="4" height="13.6" rx="1.6" />
+                </svg>
+              </button>
+
+              <button id="tray-next-btn" class="transport-pill-btn md" aria-label="Next track" title="Next">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="17.1" y="5.5" width="2.4" height="13" rx="1.2" />
+                  <path d="M5.7 6.2a1.3 1.3 0 0 1 2-.9l8 5.4a1.3 1.3 0 0 1 0 2.2l-8 5.4a1.3 1.3 0 0 1-2-1.1V6.2Z" />
+                </svg>
+              </button>
+
+              <button id="tray-repeat-btn" class="transport-pill-btn subtle" aria-label="Repeat" title="Repeat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 2l4 4-4 4" />
+                  <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+                  <path d="M7 22l-4-4 4-4" />
+                  <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+                </svg>
+              </button>
             </div>
 
-            <div class="tray-volume-row">
-              <span>🔈</span>
-              <input id="volume-bar" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
-              <span>🔊</span>
+            <!-- Custom Futuristic Volume Capsule -->
+            <div class="custom-vol-control">
+              <button id="volume-mute-btn" class="vol-mute-btn" aria-label="Mute or unmute" title="Mute / Unmute">
+                <svg class="vol-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                  <path class="vol-wave-1" d="M15.5 8.5a5 5 0 0 1 0 7" />
+                  <path class="vol-wave-2" d="M18.8 5.5a9.5 9.5 0 0 1 0 13" />
+                  <line class="vol-slash hidden" x1="22" y1="9" x2="16" y2="15" />
+                  <line class="vol-slash-2 hidden" x1="16" y1="9" x2="22" y2="15" />
+                </svg>
+              </button>
+
+              <div
+                id="custom-volume-track"
+                class="custom-vol-track"
+                role="slider"
+                tabindex="0"
+                aria-label="Volume"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="80"
+              >
+                <div class="custom-vol-fill" id="custom-vol-fill"></div>
+                <div class="custom-vol-thumb" id="custom-vol-thumb"></div>
+              </div>
+
+              <span id="volume-readout" class="vol-readout">80%</span>
             </div>
           </div>
 
@@ -274,23 +356,23 @@
         <!-- SLIDE 2: Up Next Queue Picker -->
         <div class="tray-slide" id="slide-queue">
           <div class="slide-subhead">
-            <h3>Up Next • Pick Track</h3>
+            <h3>Up Next</h3>
             <span id="picker-count" class="mono-time">0 items</span>
           </div>
           <div id="tray-queue-list" class="tray-scroll-box"></div>
-          <div class="swipe-hint" data-go="2">Swipe left again for Lyrics →</div>
+          <div class="swipe-hint" data-go="2">Swipe left for Lyrics →</div>
         </div>
 
         <!-- SLIDE 3: Synced Lyrics -->
         <div class="tray-slide" id="slide-lyrics">
           <div class="slide-subhead">
-            <h3>🎤 Song Lyrics</h3>
+            <h3>Lyrics</h3>
             <span id="lyrics-status" class="mono-time">Ready</span>
           </div>
           <div id="tray-lyrics-box" class="tray-scroll-box lyrics-box">
             <p class="lyrics-placeholder">Play any song to view lyrics here.</p>
           </div>
-          <div class="swipe-hint" data-go="0">← Back to Player</div>
+          <div class="swipe-hint" data-go="0">← Back to Now Playing</div>
         </div>
       </div>
     </section>
@@ -300,7 +382,7 @@
   <div class="tray-backdrop" id="yt-modal-backdrop" aria-hidden="true">
     <div class="yt-modal liquid-card" role="dialog" aria-modal="true" aria-label="YouTube Music API Setup">
       <div class="tray-header-row">
-        <span class="m3-badge">▶ YOUTUBE MUSIC API ENGINE</span>
+        <span class="m3-badge">▶ YOUTUBE MUSIC API</span>
         <button id="yt-modal-close" class="icon-close-btn">✕</button>
       </div>
       <p class="modal-desc">
