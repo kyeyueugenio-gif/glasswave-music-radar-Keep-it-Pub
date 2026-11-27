@@ -41,7 +41,7 @@
       <input
         id="search-input"
         type="search"
-        placeholder="Search Joshua Baraka, Elijah Kitaka, Tems, Burna Boy..."
+        placeholder="Search Joshua Baraka, Azawi, Tems, Burna Boy..."
         autocomplete="off"
       />
       <button type="submit" class="btn-expressive">Explore</button>
@@ -81,10 +81,9 @@
         </h1>
 
         <p class="hero-copy">
-          Stream fresh <strong>Ugandan &amp; Global music</strong>, tune into <strong>Live FM Radio</strong>, and read <strong>Synced Lyrics</strong> inside a fluid <strong>Material 3 Expressive</strong> &amp; <strong>Apple Liquid Glass</strong> experience.
+          Stream fresh <strong>Ugandan &amp; Global music</strong>, tune into <strong>Live FM Radio</strong>, and swipe inside the mini-player tray for <strong>Up Next</strong> &amp; <strong>Synced Lyrics</strong>.
         </p>
 
-        <!-- Region & Expressive Filter Chips -->
         <div class="control-deck">
           <div class="segmented-glass" role="tablist" aria-label="Music Region">
             <button class="seg-btn active" data-region="all">All Waves</button>
@@ -118,7 +117,7 @@
 
         <div class="spotlight-meta">
           <h2 id="spotlight-title">Loading...</h2>
-          <p id="spotlight-artist">Fetching newest tracks</p>
+          <p id="spotlight-artist">Syncing tracks</p>
         </div>
 
         <button id="spotlight-play-btn" class="morph-play-btn">
@@ -132,7 +131,7 @@
     <section class="stats-strip">
       <div class="stat-pill tonal-card">
         <span class="stat-label">SOURCE ENGINE</span>
-        <strong id="stat-source" class="stat-val">Latest Sync</strong>
+        <strong id="stat-source" class="stat-val">Instant Sync</strong>
       </div>
       <div class="stat-pill tonal-card">
         <span class="stat-label">M3 PALETTE</span>
@@ -165,15 +164,15 @@
   </main>
 
   <!-- Slim Compact Floating Bottom Mini-Player -->
-  <footer class="player-dock liquid-card" id="player-dock" title="Tap to open Now Playing Tray">
+  <footer class="player-dock liquid-card" id="player-dock" title="Tap to open compact tray">
     <div class="dock-art-morph" id="dock-art-wrap">
       <img id="dock-img" src="" alt="Now Playing" />
     </div>
 
     <div class="dock-meta-col">
       <div class="dock-text-row">
-        <span id="dock-title" class="dock-title">Pick a track or station</span>
-        <span id="dock-artist" class="dock-artist">Tap bar for tray &amp; lyrics</span>
+        <span id="dock-title" class="dock-title">Pick a track or radio</span>
+        <span id="dock-artist" class="dock-artist">Tap bar for tray, Up Next &amp; Lyrics</span>
       </div>
       <div class="progress-wrap">
         <span id="current-time" class="mono-time">0:00</span>
@@ -194,54 +193,56 @@
   </footer>
 
   <!-- =========================================================
-       ZERO-SCROLL NOW-PLAYING TRAY (Space on sides, Queue + Lyrics)
+       COMPACT 3-SLIDE TRAY (Player -> Swipe Left: Up Next -> Swipe Left: Lyrics)
        ========================================================= -->
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
-    <section class="now-playing-tray liquid-card" role="dialog" aria-modal="true" aria-label="Now Playing Picker Tray">
+    <section class="now-playing-tray liquid-card" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
+      <!-- Top Slide Switcher + Close -->
       <header class="tray-top">
-        <div class="tray-header-row">
-          <span class="m3-badge" id="tray-mode-badge">NOW PLAYING</span>
-          <div class="tray-header-actions">
-            <a id="tray-ytm-link" class="pill-btn small-pill" href="https://music.youtube.com" target="_blank" rel="noopener">
-              ↗ YT Music
-            </a>
-            <button id="tray-close-btn" class="icon-close-btn" aria-label="Close Picker Tray">✕</button>
-          </div>
+        <div class="tray-slide-pills" role="tablist" aria-label="Tray Views">
+          <button class="tray-dot active" data-slide="0">♪ Player</button>
+          <button class="tray-dot" data-slide="1">☰ Up Next</button>
+          <button class="tray-dot" data-slide="2">🎤 Lyrics</button>
+        </div>
+        <div class="tray-header-actions">
+          <a id="tray-ytm-link" class="pill-btn small-pill" href="https://music.youtube.com" target="_blank" rel="noopener">
+            ↗ YT
+          </a>
+          <button id="tray-close-btn" class="icon-close-btn" aria-label="Close Tray">✕</button>
         </div>
       </header>
 
-      <div class="tray-body">
-        <!-- Left: Compact Zero-Scroll Player Pane -->
-        <div class="tray-player-pane">
-          <div class="tray-hero-compact">
-            <div class="tray-media-box">
-              <div class="expressive-scallop-ring tray-ring" aria-hidden="true"></div>
-              <img id="tray-art" src="" alt="Album Cover" />
-              <iframe
-                id="tray-yt-iframe"
-                class="tray-yt-iframe hidden"
-                allow="autoplay; encrypted-media"
-                allowfullscreen
-                title="YouTube Music Player"
-              ></iframe>
-            </div>
+      <!-- Horizontal Swipe / Slide Carousel -->
+      <div class="tray-carousel" id="tray-carousel">
+        <!-- SLIDE 1: Compact Player -->
+        <div class="tray-slide" id="slide-player">
+          <div class="tray-media-box">
+            <div class="expressive-scallop-ring tray-ring" aria-hidden="true"></div>
+            <img id="tray-art" src="" alt="Album Cover" />
+            <iframe
+              id="tray-yt-iframe"
+              class="tray-yt-iframe hidden"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              title="YouTube Music Player"
+            ></iframe>
+          </div>
 
-            <div class="tray-song-info">
-              <div class="tray-title-row">
-                <div class="tray-title-text">
-                  <h2 id="tray-title">Select a Song</h2>
-                  <p id="tray-artist">Uganda &amp; Global Music</p>
-                </div>
-                <div class="tray-quick-icons">
-                  <button id="tray-like-btn" class="fav-btn" title="Save to Liked">♡</button>
-                  <button id="tray-share-btn" class="fav-btn" title="Share Track">⤴</button>
-                </div>
+          <div class="tray-song-info">
+            <div class="tray-title-row">
+              <div class="tray-title-text">
+                <h2 id="tray-title">Select a Song</h2>
+                <p id="tray-artist">Uganda &amp; Global Music</p>
               </div>
-              <div class="tray-meta-badges">
-                <span class="m3-badge tonal" id="tray-region-badge">🌍 GLOBAL</span>
-                <span class="m3-badge tonal" id="tray-year-badge">2025</span>
-                <span class="m3-badge tonal" id="tray-genre-badge">Music</span>
+              <div class="tray-quick-icons">
+                <button id="tray-like-btn" class="fav-btn" title="Save to Liked">♡</button>
+                <button id="tray-share-btn" class="fav-btn" title="Share Track">⤴</button>
               </div>
+            </div>
+            <div class="tray-meta-badges">
+              <span class="m3-badge tonal" id="tray-region-badge">🌍 GLOBAL</span>
+              <span class="m3-badge tonal" id="tray-year-badge">2025</span>
+              <span class="m3-badge tonal" id="tray-genre-badge">Music</span>
             </div>
           </div>
 
@@ -266,22 +267,30 @@
               <span>🔊</span>
             </div>
           </div>
+
+          <div class="swipe-hint" data-go="1">Swipe left for Up Next &amp; Lyrics →</div>
         </div>
 
-        <!-- Right: Tabbed Queue Picker & Synced Lyrics -->
-        <div class="tray-picker-pane">
-          <div class="picker-tabs-row">
-            <div class="picker-tabs">
-              <button class="picker-tab active" data-pane="queue">☰ Up Next</button>
-              <button class="picker-tab" data-pane="lyrics">🎤 Lyrics</button>
-            </div>
-            <span id="picker-count" class="mono-time">0</span>
+        <!-- SLIDE 2: Up Next Queue Picker -->
+        <div class="tray-slide" id="slide-queue">
+          <div class="slide-subhead">
+            <h3>Up Next • Pick Track</h3>
+            <span id="picker-count" class="mono-time">0 items</span>
           </div>
-
           <div id="tray-queue-list" class="tray-scroll-box"></div>
-          <div id="tray-lyrics-box" class="tray-scroll-box lyrics-box hidden">
-            <p class="lyrics-placeholder">Play a track to load synced lyrics...</p>
+          <div class="swipe-hint" data-go="2">Swipe left again for Lyrics →</div>
+        </div>
+
+        <!-- SLIDE 3: Synced Lyrics -->
+        <div class="tray-slide" id="slide-lyrics">
+          <div class="slide-subhead">
+            <h3>🎤 Song Lyrics</h3>
+            <span id="lyrics-status" class="mono-time">Ready</span>
           </div>
+          <div id="tray-lyrics-box" class="tray-scroll-box lyrics-box">
+            <p class="lyrics-placeholder">Play any song to view lyrics here.</p>
+          </div>
+          <div class="swipe-hint" data-go="0">← Back to Player</div>
         </div>
       </div>
     </section>
