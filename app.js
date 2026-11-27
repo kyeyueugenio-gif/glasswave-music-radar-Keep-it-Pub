@@ -1,9 +1,10 @@
-/* MUZIKIGLASS: 60fps Tablet + Restored Design + Dual Engine (iTunes + Deezer) */
-const EXPRESSIVE_PALETTES = [
-  { name: "Kampala Sunset", primary: "#ff7a45", primaryContainer: "rgba(255, 122, 69, 0.24)", secondary: "#38bdf8", secondaryContainer: "rgba(56, 189, 248, 0.2)", tertiary: "#e879f9" },
-  { name: "Nile Emerald", primary: "#34d399", primaryContainer: "rgba(52, 211, 153, 0.22)", secondary: "#60a5fa", secondaryContainer: "rgba(96, 165, 250, 0.2)", tertiary: "#c084fc" },
-  { name: "Afrobeat Gold", primary: "#fbbf24", primaryContainer: "rgba(251, 191, 36, 0.24)", secondary: "#fb7185", secondaryContainer: "rgba(251, 113, 133, 0.2)", tertiary: "#818cf8" },
-  { name: "Global Neon", primary: "#60a5fa", primaryContainer: "rgba(96, 165, 250, 0.24)", secondary: "#f472b6", secondaryContainer: "rgba(244, 114, 182, 0.2)", tertiary: "#2dd4bf" },
+/* MUZIKIGLASS: Light-Sheet Architecture + 70+ Ugandan & Global FM + 60fps Tablet */
+const ACCENT_PALETTES = [
+  { name: "Apple Crimson", primary: "#FA243C", secondary: "#FF6B4A", soft: "rgba(250, 36, 60, 0.11)" },
+  { name: "Kampala Sunset", primary: "#FF6B2C", secondary: "#F59E0B", soft: "rgba(255, 107, 44, 0.12)" },
+  { name: "Ocean Indigo", primary: "#2563EB", secondary: "#0EA5E9", soft: "rgba(37, 99, 235, 0.11)" },
+  { name: "Nile Emerald", primary: "#059669", secondary: "#10B981", soft: "rgba(5, 150, 105, 0.11)" },
+  { name: "Electric Plum", primary: "#9333EA", secondary: "#EC4899", soft: "rgba(147, 51, 234, 0.11)" },
 ];
 
 const QUERY_PRESETS = {
@@ -22,10 +23,10 @@ const INITIAL_CATALOG = [
 ];
 
 const RELIABLE_RADIO = [
-  { id: "rad-somafm-groove", title: "SomaFM Groove Salad", artist: "Global Ambient & Chill Beats", album: "Live FM", genre: "Chill", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80", previewUrl: "https://ice1.somafm.com/groovesalad-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
-  { id: "rad-rp-main", title: "Radio Paradise Mix", artist: "World Eclectic & Indie", album: "Live FM", genre: "Global Mix", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80", previewUrl: "https://stream.radioparadise.com/mp3-128", releaseDate: "2026-01-01", releaseYear: "LIVE" },
-  { id: "rad-somafm-lush", title: "SomaFM Lush Vocals", artist: "Electronic & Vocal Chill", album: "Live FM", genre: "Vocal", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80", previewUrl: "https://ice1.somafm.com/lush-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
-  { id: "rad-somafm-beat", title: "SomaFM Beat Blender", artist: "Deep House & Downtempo", album: "Live FM", genre: "House", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80", previewUrl: "https://ice1.somafm.com/beatblender-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
+  { id: "rad-somafm-groove", title: "SomaFM Groove Salad", artist: "Global Ambient & Chill", album: "Live FM", genre: "Chill", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&q=75", previewUrl: "https://ice1.somafm.com/groovesalad-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
+  { id: "rad-rp-main", title: "Radio Paradise Mix", artist: "World Eclectic & Indie", album: "Live FM", genre: "Mix", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&q=75", previewUrl: "https://stream.radioparadise.com/mp3-128", releaseDate: "2026-01-01", releaseYear: "LIVE" },
+  { id: "rad-somafm-lush", title: "SomaFM Lush Vocals", artist: "Electronic & Vocal Chill", album: "Live FM", genre: "Vocal", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&q=75", previewUrl: "https://ice1.somafm.com/lush-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
+  { id: "rad-somafm-beat", title: "SomaFM Beat Blender", artist: "Deep House & Downtempo", album: "Live FM", genre: "House", region: "radio", isRadio: true, freqLabel: "128 kbps", artwork: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&q=75", previewUrl: "https://ice1.somafm.com/beatblender-128-mp3", releaseDate: "2026-01-01", releaseYear: "LIVE" },
 ];
 
 const state = {
@@ -35,6 +36,7 @@ const state = {
   activeQueue: [],
   likedMap: JSON.parse(localStorage.getItem("muzikiglass_liked") || "{}"),
   ytApiKey: localStorage.getItem("muzikiglass_yt_key") || "",
+  theme: localStorage.getItem("muzikiglass_theme") || "light",
   region: "all", genre: "trending", sortBy: "newest", searchQuery: "",
   currentTrackId: null, isPlaying: false, shuffle: false, repeatMode: "off",
   paletteIdx: 0, volume: 0.8, lastVolume: 0.8, isMuted: false, currentSlide: 0,
@@ -66,11 +68,20 @@ const trayScrubber = document.getElementById("tray-scrubber");
 const volMuteBtn = document.getElementById("volume-mute-btn");
 const volTrack = document.getElementById("custom-volume-track");
 const volReadout = document.getElementById("volume-readout");
+const appearanceBtn = document.getElementById("appearance-toggle-btn");
 
 function setGreeting() {
   const hr = new Date().getHours();
   document.getElementById("greeting-text").textContent = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
 }
+
+function applyAppearance(mode) {
+  state.theme = mode;
+  document.documentElement.setAttribute("data-theme", mode);
+  localStorage.setItem("muzikiglass_theme", mode);
+  appearanceBtn.textContent = mode === "light" ? "☾ Dark" : "☀ Light";
+}
+appearanceBtn.addEventListener("click", () => applyAppearance(state.theme === "light" ? "dark" : "light"));
 
 async function fetchWithTimeout(url, ms = 5500) {
   const ctrl = new AbortController();
@@ -88,34 +99,29 @@ function showToast(msg) {
 }
 
 function applyPalette(index) {
-  state.paletteIdx = index % EXPRESSIVE_PALETTES.length;
-  const p = EXPRESSIVE_PALETTES[state.paletteIdx];
+  state.paletteIdx = index % ACCENT_PALETTES.length;
+  const p = ACCENT_PALETTES[state.paletteIdx];
   const root = document.documentElement;
-  root.style.setProperty("--md-primary", p.primary);
-  root.style.setProperty("--md-primary-container", p.primaryContainer);
-  root.style.setProperty("--md-secondary", p.secondary);
-  root.style.setProperty("--md-secondary-container", p.secondaryContainer);
-  root.style.setProperty("--md-tertiary", p.tertiary);
+  root.style.setProperty("--accent-color", p.primary);
+  root.style.setProperty("--accent-secondary", p.secondary);
+  root.style.setProperty("--accent-soft", p.soft);
 }
 
 document.getElementById("theme-cycle-btn").addEventListener("click", () => {
   applyPalette(state.paletteIdx + 1);
-  showToast(`Theme: ${EXPRESSIVE_PALETTES[state.paletteIdx].name}`);
+  showToast(`Tone: ${ACCENT_PALETTES[state.paletteIdx].name}`);
 });
 
-/* GPU Volume + Wavy Scrubber */
+/* GPU Volume & Wavy Scrubber */
 function setVolumeLevel(val, { saveNonZero = true } = {}) {
   const clamped = Math.max(0, Math.min(1, val));
-  state.volume = clamped;
-  state.isMuted = clamped === 0;
+  state.volume = clamped; state.isMuted = clamped === 0;
   if (saveNonZero && clamped > 0) state.lastVolume = clamped;
   audioPlayer.volume = clamped;
-
   const pct = Math.round(clamped * 100);
   volTrack.style.setProperty("--vol", clamped.toFixed(4));
   volReadout.textContent = `${pct}%`;
   volTrack.setAttribute("aria-valuenow", String(pct));
-
   volMuteBtn.classList.toggle("muted", state.isMuted);
   volMuteBtn.querySelector(".vol-wave-1").classList.toggle("hidden", state.isMuted);
   volMuteBtn.querySelector(".vol-wave-2").classList.toggle("hidden", state.isMuted || clamped < 0.48);
@@ -124,15 +130,12 @@ function setVolumeLevel(val, { saveNonZero = true } = {}) {
 }
 
 function bindGpuSlider(el, onRatio) {
-  const handlePointer = (e) => {
-    const rect = el.getBoundingClientRect();
-    onRatio(Math.max(0, Math.min(1, (e.clientX - rect.left) / (rect.width || 1))));
+  const handle = (e) => {
+    const r = el.getBoundingClientRect();
+    onRatio(Math.max(0, Math.min(1, (e.clientX - r.left) / (r.width || 1))));
   };
-  el.addEventListener("pointerdown", (e) => {
-    e.stopPropagation(); e.preventDefault();
-    el.setPointerCapture(e.pointerId); el.classList.add("dragging"); handlePointer(e);
-  });
-  el.addEventListener("pointermove", (e) => { if (el.classList.contains("dragging")) handlePointer(e); });
+  el.addEventListener("pointerdown", (e) => { e.stopPropagation(); e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add("dragging"); handle(e); });
+  el.addEventListener("pointermove", (e) => { if (el.classList.contains("dragging")) handle(e); });
   const end = () => el.classList.remove("dragging");
   el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
 }
@@ -148,24 +151,17 @@ volMuteBtn.addEventListener("click", () => {
 });
 
 function updateProgressVisual(ratio) {
-  const clamped = Math.max(0, Math.min(1, ratio));
-  const clipRight = `${((1 - clamped) * 100).toFixed(2)}%`;
-  const pct = String(Math.round(clamped * 100));
-  [dockScrubber, trayScrubber].forEach((s) => {
-    s.style.setProperty("--prog", clamped.toFixed(4));
-    s.style.setProperty("--clip-right", clipRight);
-    s.setAttribute("aria-valuenow", pct);
-  });
+  const c = Math.max(0, Math.min(1, ratio));
+  const clip = `${((1 - c) * 100).toFixed(2)}%`;
+  const pct = String(Math.round(c * 100));
+  [dockScrubber, trayScrubber].forEach((s) => { s.style.setProperty("--prog", c.toFixed(4)); s.style.setProperty("--clip-right", clip); s.setAttribute("aria-valuenow", pct); });
 }
 
-function seekToRatio(ratio) {
-  updateProgressVisual(ratio);
-  if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration;
-}
+function seekToRatio(ratio) { updateProgressVisual(ratio); if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration; }
 bindGpuSlider(dockScrubber, seekToRatio);
 bindGpuSlider(trayScrubber, seekToRatio);
 
-/* Dual Music Engine (iTunes + Deezer JSONP Backup) */
+/* Music + 70+ FM Stations Fetchers */
 function fetchDeezerJsonp(term, regionTag) {
   return new Promise((resolve) => {
     const cb = `dzCb_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
@@ -192,16 +188,12 @@ async function fetchTrackBatch(term, regionTag) {
     const res = await fetchWithTimeout(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=12`, 4500);
     if (res.ok) {
       const data = await res.json();
-      const mapped = (data.results || [])
-        .filter((i) => i.trackName && i.artworkUrl100 && i.previewUrl)
-        .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0))
-        .slice(0, 6)
+      const mapped = (data.results || []).filter((i) => i.trackName && i.artworkUrl100 && i.previewUrl)
+        .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0)).slice(0, 6)
         .map((i) => ({
-          id: String(i.trackId), title: i.trackName, artist: i.artistName,
-          album: i.collectionName || "Single", genre: i.primaryGenreName || "Music",
-          region: regionTag, artwork: i.artworkUrl100.replace("100x100bb", "600x600bb"),
-          previewUrl: i.previewUrl, releaseDate: i.releaseDate || "2024-01-01",
-          releaseYear: i.releaseDate ? i.releaseDate.slice(0, 4) : "2025",
+          id: String(i.trackId), title: i.trackName, artist: i.artistName, album: i.collectionName || "Single",
+          genre: i.primaryGenreName || "Music", region: regionTag, artwork: i.artworkUrl100.replace("100x100bb", "600x600bb"),
+          previewUrl: i.previewUrl, releaseDate: i.releaseDate || "2024-01-01", releaseYear: i.releaseDate ? i.releaseDate.slice(0, 4) : "2025",
         }));
       if (mapped.length) return mapped;
     }
@@ -214,9 +206,8 @@ async function fetchYouTubeTrending(regionCode, regionTag) {
   if (!res.ok) throw new Error("YT API error");
   const data = await res.json();
   return (data.items || []).map((v) => ({
-    id: `yt-${v.id}`, ytVideoId: v.id, title: v.snippet.title,
-    artist: v.snippet.channelTitle.replace(" - Topic", ""), album: "YouTube Music", genre: "YouTube", region: regionTag,
-    artwork: v.snippet.thumbnails?.high?.url || v.snippet.thumbnails?.medium?.url || "",
+    id: `yt-${v.id}`, ytVideoId: v.id, title: v.snippet.title, artist: v.snippet.channelTitle.replace(" - Topic", ""),
+    album: "YouTube Music", genre: "YouTube", region: regionTag, artwork: v.snippet.thumbnails?.high?.url || "",
     previewUrl: "", releaseDate: v.snippet.publishedAt || "2025-01-01", releaseYear: (v.snippet.publishedAt || "2025").slice(0, 4),
   }));
 }
@@ -226,33 +217,51 @@ async function fetchYouTubeSearch(query, regionTag) {
   if (!res.ok) throw new Error("YT Search error");
   const data = await res.json();
   return (data.items || []).map((v) => ({
-    id: `yt-${v.id.videoId}`, ytVideoId: v.id.videoId, title: v.snippet.title,
-    artist: v.snippet.channelTitle.replace(" - Topic", ""), album: "YouTube Music", genre: "YouTube", region: regionTag,
-    artwork: v.snippet.thumbnails?.high?.url || v.snippet.thumbnails?.medium?.url || "",
+    id: `yt-${v.id.videoId}`, ytVideoId: v.id.videoId, title: v.snippet.title, artist: v.snippet.channelTitle.replace(" - Topic", ""),
+    album: "YouTube Music", genre: "YouTube", region: regionTag, artwork: v.snippet.thumbnails?.high?.url || "",
     previewUrl: "", releaseDate: v.snippet.publishedAt || "2025-01-01", releaseYear: (v.snippet.publishedAt || "2025").slice(0, 4),
   }));
 }
 
 async function fetchLiveRadioStations() {
-  const urls = [
-    "https://all.api.radio-browser.info/json/stations/search?countrycode=UG&hidebroken=true&order=clickcount&reverse=true&limit=10",
-    "https://de1.api.radio-browser.info/json/stations/search?countrycode=UG&hidebroken=true&order=clickcount&reverse=true&limit=10",
-  ];
-  for (const url of urls) {
+  const mirrors = ["https://all.api.radio-browser.info", "https://de1.api.radio-browser.info", "https://nl1.api.radio-browser.info"];
+  const statusEl = document.getElementById("radio-status");
+
+  for (const base of mirrors) {
     try {
-      const res = await fetchWithTimeout(url, 4500);
-      if (!res.ok) continue;
-      const data = await res.json();
-      const ugFm = data.filter((s) => (s.url_resolved || "").startsWith("https://")).map((s) => ({
-        id: `rad-${s.stationuuid}`, title: s.name.trim(), artist: "Uganda FM", album: "Live Broadcast",
-        genre: (s.tags || "Uganda FM").split(",")[0] || "Radio", region: "radio", isRadio: true,
-        freqLabel: `${s.bitrate || 128} kbps`,
-        artwork: s.favicon && s.favicon.startsWith("https://") ? s.favicon : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
+      const [ugRes, glRes] = await Promise.all([
+        fetchWithTimeout(`${base}/json/stations/search?countrycode=UG&hidebroken=true&order=clickcount&reverse=true&limit=70`, 6000),
+        fetchWithTimeout(`${base}/json/stations/search?is_https=true&hidebroken=true&order=votes&reverse=true&limit=45`, 6000),
+      ]);
+      const ugData = ugRes.ok ? await ugRes.json() : [];
+      const glData = glRes.ok ? await glRes.json() : [];
+
+      const mapStation = (s, fallbackLabel) => ({
+        id: `rad-${s.stationuuid}`, title: (s.name || "FM Station").trim(),
+        artist: `${s.state || s.country || fallbackLabel} • ${(s.tags || "Music").split(",")[0] || "FM"}`,
+        album: "Live Broadcast", genre: (s.tags || "FM").split(",")[0] || "Radio",
+        region: "radio", isRadio: true, freqLabel: `${s.bitrate || 128} kbps`,
+        artwork: s.favicon && s.favicon.startsWith("https://") ? s.favicon : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&q=75",
         previewUrl: s.url_resolved, releaseDate: "2026-01-01", releaseYear: "LIVE",
-      }));
-      if (ugFm.length) { state.radioStations = [...ugFm, ...RELIABLE_RADIO]; renderRadioSection(); return; }
+      });
+
+      const seenUrl = new Set();
+      const combined = [...ugData, ...glData]
+        .filter((s) => (s.url_resolved || "").startsWith("https://") && !seenUrl.has(s.url_resolved) && seenUrl.add(s.url_resolved))
+        .slice(0, 75)
+        .map((s) => mapStation(s, s.countrycode === "UG" ? "Uganda FM" : "Global FM"));
+
+      if (combined.length) {
+        state.radioStations = [...combined, ...RELIABLE_RADIO].slice(0, 76);
+        statusEl.textContent = `${state.radioStations.length} live Ugandan & Global FM streams`;
+        document.getElementById("radio-count").textContent = state.radioStations.length;
+        renderRadioSection();
+        return;
+      }
     } catch {}
   }
+  statusEl.textContent = `${state.radioStations.length} curated live FM streams`;
+  document.getElementById("radio-count").textContent = state.radioStations.length;
 }
 
 async function loadCharts() {
@@ -287,9 +296,7 @@ async function loadCharts() {
       for (let i = 0; i < Math.max(ug.length, gl.length); i++) { if (ug[i]) mixed.push(ug[i]); if (gl[i]) mixed.push(gl[i]); }
       state.tracks = mixed;
       statusEl.textContent = state.ytApiKey ? "YOUTUBE MUSIC LIVE • UGANDA & GLOBAL" : "KAMPALA TO THE WORLD • LATEST DROPS";
-    } else {
-      statusEl.textContent = "CURATED TRACKS • READY TO PLAY";
-    }
+    } else { statusEl.textContent = "CURATED TRACKS • READY TO PLAY"; }
   } catch { statusEl.textContent = "CURATED TRACKS • READY TO PLAY"; }
   applyFiltersAndRender();
 }
@@ -310,7 +317,6 @@ async function loadLyricsForTrack(track) {
   const status = document.getElementById("lyrics-status");
   state.syncedLines = []; state.activeLyricIdx = -1;
   if (!track || track.isRadio) { status.textContent = "Live FM"; box.innerHTML = `<p class="lyrics-placeholder">Live FM broadcast — switch to a music track to view lyrics.</p>`; return; }
-
   status.textContent = "Searching..."; box.innerHTML = `<p class="lyrics-placeholder">Finding lyrics for "${track.title}"...</p>`;
   const t = cleanTrackName(track.title), a = cleanTrackName(track.artist);
   try {
@@ -350,7 +356,7 @@ function updateActiveLyric(currentTime) {
   }
 }
 
-/* Render Sections */
+/* Rendering + Micro Equalizer */
 function updateLikedCounter() { document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length; }
 function toggleLike(track, e) {
   if (e) e.stopPropagation();
@@ -359,7 +365,6 @@ function toggleLike(track, e) {
   localStorage.setItem("muzikiglass_liked", JSON.stringify(state.likedMap));
   updateLikedCounter(); syncTrayDetails(); applyFiltersAndRender();
 }
-
 function matchesSearch(item, q) {
   if (!q) return true;
   const s = q.toLowerCase();
@@ -375,18 +380,21 @@ function renderSpotlight(track) {
   document.getElementById("spotlight-play-btn").onclick = () => playItem(track, state.activeQueue);
 }
 
+const eqMarkup = `<span class="eq-mini" aria-hidden="true"><span></span><span></span><span></span></span>`;
+
 function renderRadioSection() {
   const show = state.region === "all" || state.region === "radio";
   radioSection.classList.toggle("hidden", !show);
   if (!show) return;
   const stations = state.radioStations.filter((s) => matchesSearch(s, state.searchQuery.trim()));
+  document.getElementById("radio-count").textContent = state.radioStations.length;
   radioGrid.innerHTML = "";
   const frag = document.createDocumentFragment();
   stations.forEach((st) => {
     const card = document.createElement("article");
     card.className = `radio-card${state.currentTrackId === st.id && state.isPlaying ? " playing" : ""}`;
     card.dataset.trackId = st.id;
-    card.innerHTML = `<img class="radio-thumb" src="${st.artwork}" alt="${st.title}" loading="lazy" /><div class="radio-info"><h3>${st.title}</h3><p>${st.artist}</p></div><span class="freq-badge"><span class="live-dot"></span>${st.freqLabel || "LIVE"}</span>`;
+    card.innerHTML = `<img class="radio-thumb" src="${st.artwork}" alt="${st.title}" loading="lazy" /><div class="radio-info"><div class="radio-title-row"><h3>${st.title}</h3>${eqMarkup}</div><p>${st.artist}</p></div><span class="freq-badge"><span class="live-dot"></span>${st.freqLabel || "LIVE"}</span>`;
     card.addEventListener("click", () => playItem(st, stations));
     frag.appendChild(card);
   });
@@ -406,7 +414,7 @@ function renderTracksSection() {
 
   state.filteredTracks = list;
   tracksGrid.innerHTML = "";
-  if (!list.length) { tracksGrid.innerHTML = `<div class="track-card"><p style="font-size:0.85rem;color:rgba(255,255,255,0.7);">No tracks found here.</p></div>`; return; }
+  if (!list.length) { tracksGrid.innerHTML = `<div class="track-card"><p style="font-size:0.85rem;color:var(--ink-secondary);">No tracks found here.</p></div>`; return; }
 
   const frag = document.createDocumentFragment();
   list.forEach((track, idx) => {
@@ -423,7 +431,7 @@ function renderTracksSection() {
         <button class="card-like-btn ${isLiked ? "liked" : ""}" aria-label="Like ${track.title}">${isLiked ? "♥" : "♡"}</button>
         <button class="card-play-fab" aria-label="Play ${track.title}">${isPlayingThis ? "⏸" : "▶"}</button>
       </div>
-      <h3 class="track-title" title="${track.title}">${track.title}</h3>
+      <div class="track-title-row"><h3 class="track-title" title="${track.title}">${track.title}</h3>${eqMarkup}</div>
       <p class="track-artist" title="${track.artist}">${track.artist}</p>
       <div class="track-footer"><span>${track.genre}</span><span>${track.releaseYear}</span></div>`;
     card.querySelector(".card-like-btn").addEventListener("click", (e) => toggleLike(track, e));
@@ -451,7 +459,7 @@ function syncPlayingCardHighlight() {
   });
 }
 
-/* Playback + Transport + Tray */
+/* Playback + Ambient Color Wash Sync */
 function getCurrentTrack() {
   return state.activeQueue.find((t) => t.id === state.currentTrackId) || state.tracks.find((t) => t.id === state.currentTrackId) || state.radioStations.find((t) => t.id === state.currentTrackId) || null;
 }
@@ -465,11 +473,13 @@ async function playItem(track, queueContext) {
   }
 
   state.currentTrackId = track.id;
+  const hash = track.title.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  applyPalette(hash % ACCENT_PALETTES.length);
+
   document.getElementById("dock-img").src = track.artwork;
   document.getElementById("dock-title").textContent = track.title;
   document.getElementById("dock-artist").textContent = track.artist;
 
-  // Auto-resolve missing preview URL on fallback cards
   if (!track.previewUrl && !track.ytVideoId && !track.isRadio) {
     const found = await fetchTrackBatch(`${track.title} ${track.artist}`, track.region);
     if (found[0]?.previewUrl) track.previewUrl = found[0].previewUrl;
@@ -486,7 +496,7 @@ async function playItem(track, queueContext) {
       audioPlayer.src = track.previewUrl;
       audioPlayer.volume = state.volume;
       audioPlayer.play().then(() => { state.isPlaying = true; updatePlayerUI(); syncPlayingCardHighlight(); })
-        .catch(() => { state.isPlaying = false; showToast("Stream unavailable — try another track"); updatePlayerUI(); syncPlayingCardHighlight(); });
+        .catch(() => { state.isPlaying = false; showToast("Stream unavailable — try another station or track"); updatePlayerUI(); syncPlayingCardHighlight(); });
     } else {
       state.isPlaying = false; showToast("Preview unavailable — open YT Music in tray");
     }
@@ -603,7 +613,7 @@ function renderTrayQueue() {
   document.getElementById("picker-count").textContent = `${state.activeQueue.length} items`;
   listEl.innerHTML = "";
   const frag = document.createDocumentFragment();
-  state.activeQueue.forEach((track) => {
+  state.activeQueue.slice(0, 60).forEach((track) => {
     const row = document.createElement("div");
     row.className = `queue-item${track.id === state.currentTrackId ? " active" : ""}`;
     row.innerHTML = `<img src="${track.artwork}" alt="${track.title}" loading="lazy" /><div class="queue-meta"><strong>${track.title}</strong><span>${track.artist}</span></div><span class="mono-time">${track.isRadio ? "FM" : track.region === "uganda" ? "UG" : "GLB"}</span>`;
@@ -675,7 +685,7 @@ document.querySelectorAll(".seg-btn").forEach((btn) => {
     btn.classList.add("active");
     state.region = btn.dataset.region;
     applyFiltersAndRender();
-    if (state.region === "radio") fetchLiveRadioStations();
+    if (state.region === "radio" && state.radioStations.length <= RELIABLE_RADIO.length) fetchLiveRadioStations();
   });
 });
 
@@ -705,6 +715,7 @@ document.getElementById("refresh-btn").addEventListener("click", () => loadChart
 document.getElementById("refresh-radio-btn").addEventListener("click", () => fetchLiveRadioStations().then(() => showToast("FM stations refreshed")));
 
 /* Boot */
+applyAppearance(state.theme);
 setGreeting();
 applyPalette(0);
 setVolumeLevel(0.8);
