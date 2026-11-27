@@ -1,4 +1,4 @@
-/* MUZIKIGLASS: Light-Sheet Architecture + 70+ Ugandan & Global FM + 60fps Tablet */
+/* MUZIKIGLASS: True Apple Music Light Mode + iOS 26 Refracted Glass + 70+ Live FM */
 const ACCENT_PALETTES = [
   { name: "Apple Crimson", primary: "#FA243C", secondary: "#FF6B4A", soft: "rgba(250, 36, 60, 0.11)" },
   { name: "Kampala Sunset", primary: "#FF6B2C", secondary: "#F59E0B", soft: "rgba(255, 107, 44, 0.12)" },
@@ -36,7 +36,7 @@ const state = {
   activeQueue: [],
   likedMap: JSON.parse(localStorage.getItem("muzikiglass_liked") || "{}"),
   ytApiKey: localStorage.getItem("muzikiglass_yt_key") || "",
-  theme: localStorage.getItem("muzikiglass_theme") || "light",
+  theme: localStorage.getItem("muzikiglass_appearance") || "light",
   region: "all", genre: "trending", sortBy: "newest", searchQuery: "",
   currentTrackId: null, isPlaying: false, shuffle: false, repeatMode: "off",
   paletteIdx: 0, volume: 0.8, lastVolume: 0.8, isMuted: false, currentSlide: 0,
@@ -70,16 +70,38 @@ const volTrack = document.getElementById("custom-volume-track");
 const volReadout = document.getElementById("volume-readout");
 const appearanceBtn = document.getElementById("appearance-toggle-btn");
 
+/* iOS 26 Refracted Glass Sliding Lens Positioning */
+function positionGlassLens(container, lensEl, activeBtn, animateSwell = true) {
+  if (!container || !lensEl || !activeBtn) return;
+  const x = activeBtn.offsetLeft;
+  const w = activeBtn.offsetWidth;
+  lensEl.style.width = `${w}px`;
+  lensEl.style.setProperty("--lens-x", `${x}px`);
+  lensEl.style.transform = `translate3d(${x}px, 0, 0)`;
+
+  if (animateSwell) {
+    lensEl.classList.add("is-sliding");
+    clearTimeout(lensEl._swellTimer);
+    lensEl._swellTimer = setTimeout(() => lensEl.classList.remove("is-sliding"), 190);
+  }
+}
+
+function syncAllLenses() {
+  positionGlassLens(document.getElementById("region-segmented"), document.getElementById("region-lens"), document.querySelector(".seg-btn.active"), false);
+  positionGlassLens(document.getElementById("tray-segmented"), document.getElementById("tray-lens"), document.querySelector(".tray-dot.active"), false);
+}
+window.addEventListener("resize", syncAllLenses, { passive: true });
+
 function setGreeting() {
   const hr = new Date().getHours();
   document.getElementById("greeting-text").textContent = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
 }
 
 function applyAppearance(mode) {
-  state.theme = mode;
-  document.documentElement.setAttribute("data-theme", mode);
-  localStorage.setItem("muzikiglass_theme", mode);
-  appearanceBtn.textContent = mode === "light" ? "☾ Dark" : "☀ Light";
+  state.theme = mode === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", state.theme);
+  localStorage.setItem("muzikiglass_appearance", state.theme);
+  appearanceBtn.setAttribute("aria-checked", state.theme === "dark" ? "true" : "false");
 }
 appearanceBtn.addEventListener("click", () => applyAppearance(state.theme === "light" ? "dark" : "light"));
 
@@ -106,7 +128,6 @@ function applyPalette(index) {
   root.style.setProperty("--accent-secondary", p.secondary);
   root.style.setProperty("--accent-soft", p.soft);
 }
-
 document.getElementById("theme-cycle-btn").addEventListener("click", () => {
   applyPalette(state.paletteIdx + 1);
   showToast(`Tone: ${ACCENT_PALETTES[state.paletteIdx].name}`);
@@ -156,7 +177,6 @@ function updateProgressVisual(ratio) {
   const pct = String(Math.round(c * 100));
   [dockScrubber, trayScrubber].forEach((s) => { s.style.setProperty("--prog", c.toFixed(4)); s.style.setProperty("--clip-right", clip); s.setAttribute("aria-valuenow", pct); });
 }
-
 function seekToRatio(ratio) { updateProgressVisual(ratio); if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = ratio * audioPlayer.duration; }
 bindGpuSlider(dockScrubber, seekToRatio);
 bindGpuSlider(trayScrubber, seekToRatio);
@@ -235,27 +255,26 @@ async function fetchLiveRadioStations() {
       ]);
       const ugData = ugRes.ok ? await ugRes.json() : [];
       const glData = glRes.ok ? await glRes.json() : [];
-
-      const mapStation = (s, fallbackLabel) => ({
-        id: `rad-${s.stationuuid}`, title: (s.name || "FM Station").trim(),
-        artist: `${s.state || s.country || fallbackLabel} • ${(s.tags || "Music").split(",")[0] || "FM"}`,
-        album: "Live Broadcast", genre: (s.tags || "FM").split(",")[0] || "Radio",
-        region: "radio", isRadio: true, freqLabel: `${s.bitrate || 128} kbps`,
-        artwork: s.favicon && s.favicon.startsWith("https://") ? s.favicon : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&q=75",
-        previewUrl: s.url_resolved, releaseDate: "2026-01-01", releaseYear: "LIVE",
-      });
-
       const seenUrl = new Set();
+
       const combined = [...ugData, ...glData]
         .filter((s) => (s.url_resolved || "").startsWith("https://") && !seenUrl.has(s.url_resolved) && seenUrl.add(s.url_resolved))
         .slice(0, 75)
-        .map((s) => mapStation(s, s.countrycode === "UG" ? "Uganda FM" : "Global FM"));
+        .map((s) => ({
+          id: `rad-${s.stationuuid}`, title: (s.name || "FM Station").trim(),
+          artist: `${s.state || s.country || (s.countrycode === "UG" ? "Uganda FM" : "Global FM")} • ${(s.tags || "Music").split(",")[0] || "FM"}`,
+          album: "Live Broadcast", genre: (s.tags || "FM").split(",")[0] || "Radio",
+          region: "radio", isRadio: true, freqLabel: `${s.bitrate || 128} kbps`,
+          artwork: s.favicon && s.favicon.startsWith("https://") ? s.favicon : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&q=75",
+          previewUrl: s.url_resolved, releaseDate: "2026-01-01", releaseYear: "LIVE",
+        }));
 
       if (combined.length) {
         state.radioStations = [...combined, ...RELIABLE_RADIO].slice(0, 76);
         statusEl.textContent = `${state.radioStations.length} live Ugandan & Global FM streams`;
         document.getElementById("radio-count").textContent = state.radioStations.length;
         renderRadioSection();
+        syncAllLenses();
         return;
       }
     } catch {}
@@ -356,7 +375,7 @@ function updateActiveLyric(currentTime) {
   }
 }
 
-/* Rendering + Micro Equalizer */
+/* Rendering */
 function updateLikedCounter() { document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length; }
 function toggleLike(track, e) {
   if (e) e.stopPropagation();
@@ -370,7 +389,6 @@ function matchesSearch(item, q) {
   const s = q.toLowerCase();
   return item.title.toLowerCase().includes(s) || item.artist.toLowerCase().includes(s) || (item.genre || "").toLowerCase().includes(s);
 }
-
 function renderSpotlight(track) {
   if (!track) return;
   document.getElementById("spotlight-img").src = track.artwork;
@@ -459,7 +477,7 @@ function syncPlayingCardHighlight() {
   });
 }
 
-/* Playback + Ambient Color Wash Sync */
+/* Playback */
 function getCurrentTrack() {
   return state.activeQueue.find((t) => t.id === state.currentTrackId) || state.tracks.find((t) => t.id === state.currentTrackId) || state.radioStations.find((t) => t.id === state.currentTrackId) || null;
 }
@@ -613,7 +631,7 @@ function renderTrayQueue() {
   document.getElementById("picker-count").textContent = `${state.activeQueue.length} items`;
   listEl.innerHTML = "";
   const frag = document.createDocumentFragment();
-  state.activeQueue.slice(0, 60).forEach((track) => {
+  state.activeQueue.slice(0, 75).forEach((track) => {
     const row = document.createElement("div");
     row.className = `queue-item${track.id === state.currentTrackId ? " active" : ""}`;
     row.innerHTML = `<img src="${track.artwork}" alt="${track.title}" loading="lazy" /><div class="queue-meta"><strong>${track.title}</strong><span>${track.artist}</span></div><span class="mono-time">${track.isRadio ? "FM" : track.region === "uganda" ? "UG" : "GLB"}</span>`;
@@ -626,7 +644,9 @@ function renderTrayQueue() {
 function goToTraySlide(slideIndex, { instant = false } = {}) {
   state.currentSlide = slideIndex;
   trayCarousel.scrollTo({ left: trayCarousel.clientWidth * slideIndex, behavior: instant ? "instant" : "smooth" });
-  document.querySelectorAll(".tray-dot").forEach((d) => d.classList.toggle("active", Number(d.dataset.slide) === slideIndex));
+  const dots = document.querySelectorAll(".tray-dot");
+  dots.forEach((d) => d.classList.toggle("active", Number(d.dataset.slide) === slideIndex));
+  positionGlassLens(document.getElementById("tray-segmented"), document.getElementById("tray-lens"), dots[slideIndex], !instant);
 }
 
 let slideScrollTimer = 0;
@@ -635,7 +655,9 @@ trayCarousel.addEventListener("scroll", () => {
   slideScrollTimer = setTimeout(() => {
     const idx = Math.round(trayCarousel.scrollLeft / (trayCarousel.clientWidth || 1));
     state.currentSlide = idx;
-    document.querySelectorAll(".tray-dot").forEach((d) => d.classList.toggle("active", Number(d.dataset.slide) === idx));
+    const dots = document.querySelectorAll(".tray-dot");
+    dots.forEach((d) => d.classList.toggle("active", Number(d.dataset.slide) === idx));
+    positionGlassLens(document.getElementById("tray-segmented"), document.getElementById("tray-lens"), dots[idx], true);
   }, 60);
 }, { passive: true });
 
@@ -646,7 +668,7 @@ function openPickerTray() {
   if (!getCurrentTrack() && state.activeQueue.length) { state.currentTrackId = state.activeQueue[0].id; syncTrayDetails(); }
   renderTrayQueue();
   trayBackdrop.classList.add("open"); trayBackdrop.setAttribute("aria-hidden", "false");
-  goToTraySlide(0, { instant: true });
+  requestAnimationFrame(() => goToTraySlide(0, { instant: true }));
 }
 function closePickerTray() { trayBackdrop.classList.remove("open"); trayBackdrop.setAttribute("aria-hidden", "true"); }
 
@@ -683,6 +705,7 @@ document.querySelectorAll(".seg-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
+    positionGlassLens(document.getElementById("region-segmented"), document.getElementById("region-lens"), btn, true);
     state.region = btn.dataset.region;
     applyFiltersAndRender();
     if (state.region === "radio" && state.radioStations.length <= RELIABLE_RADIO.length) fetchLiveRadioStations();
@@ -697,7 +720,9 @@ document.querySelectorAll(".chip").forEach((chip) => {
     document.getElementById("search-input").value = "";
     if (state.region === "radio") {
       state.region = "songs";
-      document.querySelectorAll(".seg-btn").forEach((b) => b.classList.toggle("active", b.dataset.region === "songs"));
+      const songsBtn = document.querySelector('.seg-btn[data-region="songs"]');
+      document.querySelectorAll(".seg-btn").forEach((b) => b.classList.toggle("active", b === songsBtn));
+      positionGlassLens(document.getElementById("region-segmented"), document.getElementById("region-lens"), songsBtn, true);
     }
     loadCharts();
   });
@@ -721,5 +746,6 @@ applyPalette(0);
 setVolumeLevel(0.8);
 updateLikedCounter();
 applyFiltersAndRender();
+requestAnimationFrame(syncAllLenses);
 loadCharts();
 fetchLiveRadioStations();
