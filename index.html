@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MuzikiGlass — Global & Ugandan Music Pulse</title>
+  <title>MuzikiGlass — Latest Global & Ugandan Music Pulse</title>
 
   <!-- Material Expressive Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,46 +15,13 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Gentle Optical Glass Filter (used only on glass aura/surface, never blurs readable text) -->
+  <!-- Gentle Optical Glass Filter -->
   <svg class="svg-filters" aria-hidden="true">
     <defs>
       <filter id="soft-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence
-          id="turb-text"
-          type="fractalNoise"
-          baseFrequency="0.008 0.015"
-          numOctaves="2"
-          seed="5"
-          result="noise"
-        />
+        <feTurbulence id="turb-text" type="fractalNoise" baseFrequency="0.008 0.015" numOctaves="2" seed="5" result="noise" />
         <feGaussianBlur in="noise" stdDeviation="2.5" result="smoothNoise" />
-        <feDisplacementMap
-          id="disp-text"
-          in="SourceGraphic"
-          in2="smoothNoise"
-          scale="4"
-          xChannelSelector="R"
-          yChannelSelector="G"
-        />
-      </filter>
-
-      <filter id="liquid-surface" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence
-          id="turb-surface"
-          type="turbulence"
-          baseFrequency="0.01 0.014"
-          numOctaves="2"
-          seed="3"
-          result="wave"
-        />
-        <feDisplacementMap
-          id="disp-surface"
-          in="SourceGraphic"
-          in2="wave"
-          scale="5"
-          xChannelSelector="R"
-          yChannelSelector="B"
-        />
+        <feDisplacementMap id="disp-text" in="SourceGraphic" in2="smoothNoise" scale="4" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
@@ -75,7 +42,7 @@
       </div>
       <div>
         <span class="brand-title glass-text">MuzikiGlass</span>
-        <span class="brand-sub">UGANDA × GLOBAL PULSE</span>
+        <span class="brand-sub">UGANDA × GLOBAL • LATEST</span>
       </div>
     </div>
 
@@ -87,34 +54,36 @@
       <input
         id="search-input"
         type="search"
-        placeholder="Search Eddy Kenzo, Joshua Baraka, Burna Boy, Tyla..."
+        placeholder="Search latest: Joshua Baraka, Elijah Kitaka, Tems, Burna Boy..."
         autocomplete="off"
       />
       <button type="submit" class="btn-expressive">Explore</button>
     </form>
 
     <div class="nav-controls">
+      <button id="yt-api-btn" class="pill-btn yt-pill" title="Connect YouTube Music Data API">
+        ▶ YT Music API
+      </button>
       <label class="refract-slider-wrap" title="Adjust Liquid Glass Shimmer">
         <span>Glass</span>
         <input id="refraction-range" type="range" min="0" max="10" value="4" />
       </label>
       <button id="theme-cycle-btn" class="pill-btn" title="Shift Material Expressive Palette">
-        ✦ Morph Theme
+        ✦ Morph
       </button>
     </div>
   </header>
 
   <main class="app-shell">
-    <!-- Hero Stage: Crisp Glass Typography + Material Expressive Tonal Cards -->
+    <!-- Hero Stage -->
     <section class="hero-stage liquid-card">
       <div class="hero-content">
         <div class="hero-top-row">
           <div class="live-badge">
             <span class="pulse-dot"></span>
-            <span id="live-status-text">LIVE CHARTS • KAMPALA TO THE WORLD</span>
+            <span id="live-status-text">LATEST RELEASES • KAMPALA TO THE WORLD</span>
           </div>
 
-          <!-- Live Material 3 Expressive Color Tokens HUD -->
           <div class="expressive-tokens-hud" title="Live Material 3 Expressive Color Tokens">
             <span class="token-label">M3 EXPRESSIVE</span>
             <span class="token-dot t-primary"></span>
@@ -134,8 +103,8 @@
         </h1>
 
         <p class="hero-copy">
-          An adaptive <strong>Material 3 Expressive Engine</strong> layered inside
-          <strong>Apple Liquid Glass</strong>. Every track dynamically reshapes tonal containers, organic shapes, and ambient glass light.
+          Stream the freshest <strong>Ugandan &amp; Global music</strong> inside an adaptive
+          <strong>Material 3 Expressive Engine</strong> and <strong>Apple Liquid Glass</strong>. Tap the bottom player bar anytime to open the full picker tray.
         </p>
 
         <!-- Region & Expressive Filter Chips -->
@@ -144,14 +113,15 @@
             <button class="seg-btn active" data-region="all">All Waves</button>
             <button class="seg-btn" data-region="uganda">🇺🇬 Uganda</button>
             <button class="seg-btn" data-region="global">🌍 Global</button>
+            <button class="seg-btn" data-region="liked">♥ Liked (<span id="liked-count">0</span>)</button>
           </div>
 
           <div class="genre-chips" id="genre-chips">
-            <button class="chip active" data-genre="trending">🔥 Trending</button>
-            <button class="chip" data-genre="ugaflow">🥁 Ugaflow &amp; Afrobeat</button>
-            <button class="chip" data-genre="amapiano">🎹 Amapiano</button>
-            <button class="chip" data-genre="globalpop">⚡ Global Pop</button>
-            <button class="chip" data-genre="hiphop">🎤 Hip-Hop</button>
+            <button class="chip active" data-genre="trending">🔥 Latest 2025/26</button>
+            <button class="chip" data-genre="ugaflow">🥁 New Ugaflow &amp; Afrobeat</button>
+            <button class="chip" data-genre="amapiano">🎹 Amapiano &amp; Dance</button>
+            <button class="chip" data-genre="globalpop">⚡ Global Pop &amp; R&amp;B</button>
+            <button class="chip" data-genre="hiphop">🎤 Hip-Hop &amp; Rap</button>
           </div>
         </div>
       </div>
@@ -159,7 +129,7 @@
       <!-- Featured Material Expressive Spotlight Card -->
       <aside class="spotlight-card tonal-expressive-card" id="spotlight-card">
         <div class="spotlight-header">
-          <span class="m3-badge">★ TOP PULSE</span>
+          <span class="m3-badge">★ FRESH PULSE</span>
           <span class="m3-badge tonal" id="spotlight-region">UGANDA</span>
         </div>
 
@@ -170,12 +140,12 @@
 
         <div class="spotlight-meta">
           <h2 id="spotlight-title">Loading...</h2>
-          <p id="spotlight-artist">Fetching live tracks</p>
+          <p id="spotlight-artist">Fetching newest tracks</p>
         </div>
 
         <button id="spotlight-play-btn" class="morph-play-btn">
           <span>▶</span>
-          <span>Play Preview</span>
+          <span>Play Latest</span>
         </button>
       </aside>
     </section>
@@ -183,21 +153,22 @@
     <!-- Material Expressive Tonal Stats Bar -->
     <section class="stats-strip">
       <div class="stat-pill tonal-card">
-        <span class="stat-label">TRACKS LIVE</span>
-        <strong id="stat-count" class="stat-val">0</strong>
+        <span class="stat-label">SOURCE ENGINE</span>
+        <strong id="stat-source" class="stat-val">Latest Sync</strong>
       </div>
       <div class="stat-pill tonal-card">
         <span class="stat-label">M3 PALETTE</span>
         <strong id="stat-palette" class="stat-val">Kampala Sunset</strong>
       </div>
       <div class="stat-pill tonal-card">
-        <span class="stat-label">AUDIO ENGINE</span>
+        <span class="stat-label">AUDIO STATUS</span>
         <strong id="stat-audio" class="stat-val">Ready</strong>
       </div>
       <div class="stat-pill tonal-card">
         <span class="stat-label">SORT ORDER</span>
         <select id="sort-select" class="glass-select">
-          <option value="rank">Chart Rank</option>
+          <option value="newest">Newest First</option>
+          <option value="rank">Chart Mix</option>
           <option value="title">Title (A–Z)</option>
           <option value="artist">Artist (A–Z)</option>
         </select>
@@ -207,18 +178,16 @@
     <!-- Tracks Grid -->
     <section class="tracks-section">
       <div class="section-head">
-        <h2 class="section-title" id="grid-heading">Trending Across Uganda &amp; The Globe</h2>
-        <button id="refresh-btn" class="pill-btn">↻ Sync Charts</button>
+        <h2 class="section-title" id="grid-heading">Fresh Drops Across Uganda &amp; The Globe</h2>
+        <button id="refresh-btn" class="pill-btn">↻ Sync Latest</button>
       </div>
 
-      <div id="tracks-grid" class="tracks-grid">
-        <!-- Dynamically injected expressive track cards -->
-      </div>
+      <div id="tracks-grid" class="tracks-grid"></div>
     </section>
   </main>
 
-  <!-- Compact Slim Floating Apple Liquid Glass Mini-Player -->
-  <footer class="player-dock liquid-card" id="player-dock">
+  <!-- Compact Slim Floating Apple Liquid Glass Mini-Player (Click to open Picker Tray) -->
+  <footer class="player-dock liquid-card" id="player-dock" title="Tap to open Now Playing Picker Tray">
     <div class="dock-art-morph" id="dock-art-wrap">
       <img id="dock-img" src="" alt="Now Playing" />
     </div>
@@ -226,7 +195,7 @@
     <div class="dock-meta-col">
       <div class="dock-text-row">
         <span id="dock-title" class="dock-title">Pick a track</span>
-        <span id="dock-artist" class="dock-artist">Tap any card to play</span>
+        <span id="dock-artist" class="dock-artist">Tap bar to open picker tray</span>
       </div>
       <div class="progress-wrap">
         <span id="current-time" class="mono-time">0:00</span>
@@ -242,9 +211,121 @@
       <button id="prev-btn" class="icon-btn" aria-label="Previous track">⏮</button>
       <button id="play-pause-btn" class="morph-play-circle" aria-label="Play or pause">▶</button>
       <button id="next-btn" class="icon-btn" aria-label="Next track">⏭</button>
-      <input id="volume-bar" class="volume-mini" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
+      <span class="expand-hint" aria-hidden="true">⌃</span>
     </div>
   </footer>
+
+  <!-- =========================================================
+       EXPANDED NOW-PLAYING PICKER TRAY (Leaves space on sides)
+       ========================================================= -->
+  <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
+    <section class="now-playing-tray liquid-card" role="dialog" aria-modal="true" aria-label="Now Playing Picker Tray">
+      <header class="tray-top">
+        <div class="tray-pill-handle" id="tray-handle"></div>
+        <div class="tray-header-row">
+          <span class="m3-badge">NOW PLAYING • PICKER TRAY</span>
+          <div class="tray-header-actions">
+            <a id="tray-ytm-link" class="pill-btn small-pill" href="https://music.youtube.com" target="_blank" rel="noopener">
+              ↗ Open in YT Music
+            </a>
+            <button id="tray-close-btn" class="icon-close-btn" aria-label="Close Picker Tray">✕</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="tray-body">
+        <!-- Left: Large Album Art / YouTube Video + Controls -->
+        <div class="tray-player-pane">
+          <div class="tray-media-box">
+            <div class="expressive-scallop-ring tray-ring" aria-hidden="true"></div>
+            <img id="tray-art" src="" alt="Album Cover" />
+            <iframe
+              id="tray-yt-iframe"
+              class="tray-yt-iframe hidden"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              title="YouTube Music Player"
+            ></iframe>
+          </div>
+
+          <div class="tray-song-info">
+            <div class="tray-title-row">
+              <div>
+                <h2 id="tray-title">Select a Song</h2>
+                <p id="tray-artist">Uganda &amp; Global Music</p>
+              </div>
+              <div class="tray-quick-icons">
+                <button id="tray-like-btn" class="fav-btn" title="Save to Liked">♡</button>
+                <button id="tray-share-btn" class="fav-btn" title="Share Track">⤴</button>
+              </div>
+            </div>
+            <div class="tray-meta-badges">
+              <span class="m3-badge tonal" id="tray-region-badge">🌍 GLOBAL</span>
+              <span class="m3-badge tonal" id="tray-year-badge">2025</span>
+              <span class="m3-badge tonal" id="tray-genre-badge">Music</span>
+            </div>
+          </div>
+
+          <div class="tray-seek-row">
+            <span id="tray-current-time" class="mono-time">0:00</span>
+            <input id="tray-seek-bar" type="range" min="0" max="100" value="0" />
+            <span id="tray-total-time" class="mono-time">0:30</span>
+          </div>
+
+          <div class="tray-controls-row">
+            <button id="tray-shuffle-btn" class="icon-btn" title="Shuffle">🔀</button>
+            <button id="tray-prev-btn" class="icon-btn lg" title="Previous">⏮</button>
+            <button id="tray-play-btn" class="tray-main-play" title="Play / Pause">▶</button>
+            <button id="tray-next-btn" class="icon-btn lg" title="Next">⏭</button>
+            <button id="tray-repeat-btn" class="icon-btn" title="Repeat">🔁</button>
+          </div>
+
+          <div class="tray-volume-row">
+            <span>🔈</span>
+            <input id="volume-bar" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
+            <span>🔊</span>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Song Picker Queue -->
+        <div class="tray-picker-pane">
+          <div class="picker-head">
+            <h3>Up Next • Pick Any Track</h3>
+            <span id="picker-count" class="mono-time">0 tracks</span>
+          </div>
+          <div id="tray-queue-list" class="tray-queue-list"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       YOUTUBE MUSIC API MODAL (Saves key safely in localStorage)
+       ========================================================= -->
+  <div class="tray-backdrop" id="yt-modal-backdrop" aria-hidden="true">
+    <div class="yt-modal liquid-card" role="dialog" aria-modal="true" aria-label="YouTube Music API Setup">
+      <div class="tray-header-row">
+        <span class="m3-badge">▶ YOUTUBE MUSIC API ENGINE</span>
+        <button id="yt-modal-close" class="icon-close-btn">✕</button>
+      </div>
+      <p class="modal-desc">
+        Connect your free <strong>YouTube Data API v3</strong> key to stream live <strong>Uganda (UG)</strong> &amp; <strong>Global</strong> trending music videos &amp; full-track playback directly inside MuzikiGlass. Your key stays strictly in your own browser (<code>localStorage</code>).
+      </p>
+      <input
+        id="yt-api-key-input"
+        class="modal-input"
+        type="password"
+        placeholder="Paste your YouTube Data API v3 Key (AIza...)"
+      />
+      <div class="modal-actions">
+        <button id="yt-save-btn" class="btn-expressive">Save &amp; Sync YouTube Charts</button>
+        <button id="yt-clear-btn" class="pill-btn">Clear Key (Use Free Charts)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expressive Toast Notification -->
+  <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
 
   <audio id="audio-player"></audio>
   <script src="app.js"></script>
