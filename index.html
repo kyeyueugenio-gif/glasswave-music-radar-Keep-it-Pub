@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MuzikiGlass — iOS Liquid Glass + Ugandan & Global Music</title>
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
@@ -95,7 +95,7 @@
         <button class="country-pill" data-country="ZA">🇿🇦 South Africa</button>
         <button class="country-pill" data-country="GB">🇬🇧 UK</button>
         <button class="country-pill" data-country="US">🇺🇸 USA</button>
-        <button class="country-pill" data-country="GLOBAL">🌍 Global Hits</button>
+        <button class="country-pill" data-country="ALL">🌍 All Countries</button>
       </div>
       <div id="radio-grid" class="radio-grid"></div>
     </section>
@@ -162,9 +162,10 @@
 
       <div class="tray-carousel" id="tray-carousel">
         <div class="tray-slide" id="slide-player">
+          <!-- Permanent 200x200 YT Player host (never display:none) -->
           <div class="tray-media-box">
             <img id="tray-art" src="" alt="Album Cover" />
-            <div id="yt-player-wrap" class="yt-player-wrap hidden"><div id="yt-player-mount"></div></div>
+            <div id="yt-player-wrap" class="yt-player-wrap yt-inactive"><div id="yt-player-mount"></div></div>
           </div>
           <div class="tray-song-info">
             <div class="tray-title-row">
@@ -238,7 +239,8 @@
 
   <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
   <audio id="audio-player" preload="none"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
