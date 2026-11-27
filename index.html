@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MuzikiGlass — Global & Ugandan Music Pulse</title>
+
+  <!-- Material Expressive Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Hidden SVG Filters for Apple Liquid Glass & Word Refraction -->
+  <svg class="svg-filters" aria-hidden="true">
+    <defs>
+      <!-- Optical Liquid Word Refraction + Chromatic Dispersion -->
+      <filter id="word-refraction" x="-15%" y="-25%" width="130%" height="150%" color-interpolation-filters="sRGB">
+        <feTurbulence
+          id="turb-text"
+          type="fractalNoise"
+          baseFrequency="0.015 0.045"
+          numOctaves="2"
+          seed="7"
+          result="noise"
+        />
+        <feGaussianBlur in="noise" stdDeviation="1.2" result="smoothNoise" />
+        <feDisplacementMap
+          id="disp-text"
+          in="SourceGraphic"
+          in2="smoothNoise"
+          scale="5"
+          xChannelSelector="R"
+          yChannelSelector="G"
+          result="warped"
+        />
+        <!-- Subtle prism RGB channel shift for glass edge refraction -->
+        <feOffset in="warped" dx="1.4" dy="-0.5" result="rShift" />
+        <feColorMatrix
+          in="rShift"
+          type="matrix"
+          values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.85 0"
+          result="redChannel"
+        />
+        <feOffset in="warped" dx="-1.4" dy="0.5" result="bShift" />
+        <feColorMatrix
+          in="bShift"
+          type="matrix"
+          values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 0.85 0"
+          result="blueChannel"
+        />
+        <feColorMatrix
+          in="warped"
+          type="matrix"
+          values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 0.95 0"
+          result="greenChannel"
+        />
+        <feBlend in="redChannel" in2="greenChannel" mode="screen" result="rg" />
+        <feBlend in="rg" in2="blueChannel" mode="screen" result="chromatic" />
+      </filter>
+
+      <!-- Liquid Surface Distortion Filter -->
+      <filter id="liquid-surface" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence
+          id="turb-surface"
+          type="turbulence"
+          baseFrequency="0.012 0.018"
+          numOctaves="2"
+          seed="3"
+          result="wave"
+        />
+        <feDisplacementMap
+          id="disp-surface"
+          in="SourceGraphic"
+          in2="wave"
+          scale="8"
+          xChannelSelector="R"
+          yChannelSelector="B"
+        />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Dynamic Material Expressive Mesh Backdrop -->
+  <div class="ambient-canvas" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Top Liquid Glass Navigation Bar -->
+  <header class="glass-nav liquid-card">
+    <div class="brand">
+      <div class="brand-shape" aria-hidden="true">
+        <span>♪</span>
+      </div>
+      <div>
+        <span class="brand-title refract-word">MuzikiGlass</span>
+        <span class="brand-sub">UGANDA × GLOBAL PULSE</span>
+      </div>
+    </div>
+
+    <!-- Search Capsule -->
+    <form id="search-form" class="search-capsule">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search Eddy Kenzo, Joshua Baraka, Burna Boy, Taylor Swift..."
+        autocomplete="off"
+      />
+      <button type="submit" class="btn-expressive">Explore</button>
+    </form>
+
+    <!-- Dynamic Controls -->
+    <div class="nav-controls">
+      <label class="refract-slider-wrap" title="Adjust Liquid Refraction">
+        <span>Refraction</span>
+        <input id="refraction-range" type="range" min="0" max="14" value="5" />
+      </label>
+      <button id="theme-cycle-btn" class="pill-btn" title="Shift Material Expressive Palette">
+        ✦ Dynamic Theme
+      </button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <!-- Hero Section with Liquid Refracted Typography -->
+    <section class="hero-stage liquid-card">
+      <div class="hero-content">
+        <div class="live-badge">
+          <span class="pulse-dot"></span>
+          <span id="live-status-text">LIVE CHARTS • KAMPALA TO THE WORLD</span>
+        </div>
+
+        <h1 class="hero-headline">
+          Feel the <span class="refract-word hero-accent" data-text="Liquid Sound">Liquid Sound</span><br />
+          of <span class="refract-word" data-text="Uganda & Global">Uganda & Global</span> Charts.
+        </h1>
+
+        <p class="hero-copy">
+          Powered by an adaptive <strong>Material Expressive Engine</strong> wrapped in specular
+          <strong>Apple Liquid Glass</strong>. Every track reshapes the atmosphere, light refraction, and color tokens in real time.
+        </p>
+
+        <!-- Region & Expressive Filter Chips -->
+        <div class="control-deck">
+          <div class="segmented-glass" role="tablist" aria-label="Music Region">
+            <button class="seg-btn active" data-region="all">All Waves</button>
+            <button class="seg-btn" data-region="uganda">🇺🇬 Uganda</button>
+            <button class="seg-btn" data-region="global">🌍 Global</button>
+          </div>
+
+          <div class="genre-chips" id="genre-chips">
+            <button class="chip active" data-genre="trending">🔥 Trending Now</button>
+            <button class="chip" data-genre="ugaflow">🥁 Ugaflow & Afrobeat</button>
+            <button class="chip" data-genre="amapiano">🎹 Amapiano & Dance</button>
+            <button class="chip" data-genre="globalpop">⚡ Global Pop & R&B</button>
+            <button class="chip" data-genre="hiphop">🎤 Hip-Hop</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Expressive Spotlight Card -->
+      <aside class="spotlight-card liquid-card" id="spotlight-card">
+        <div class="spotlight-header">
+          <span class="mono-tag">TOP PULSE</span>
+          <span class="mono-tag" id="spotlight-region">UGANDA</span>
+        </div>
+        <div class="spotlight-art-wrap">
+          <img id="spotlight-img" src="" alt="Featured Track Art" />
+          <div class="spotlight-glass-ring"></div>
+        </div>
+        <div class="spotlight-meta">
+          <h2 id="spotlight-title" class="refract-word">Loading...</h2>
+          <p id="spotlight-artist">Fetching live tracks</p>
+        </div>
+        <button id="spotlight-play-btn" class="morph-play-btn">
+          <span class="play-icon">▶</span>
+          <span>Play Preview</span>
+        </button>
+      </aside>
+    </section>
+
+    <!-- Chart Stats Bar -->
+    <section class="stats-strip">
+      <div class="stat-pill liquid-card">
+        <span class="stat-label">TRACKS LOADED</span>
+        <strong id="stat-count" class="stat-val refract-word">0</strong>
+      </div>
+      <div class="stat-pill liquid-card">
+        <span class="stat-label">ENGINE PALETTE</span>
+        <strong id="stat-palette" class="stat-val">Kampala Sunset</strong>
+      </div>
+      <div class="stat-pill liquid-card">
+        <span class="stat-label">AUDIO STATUS</span>
+        <strong id="stat-audio" class="stat-val">Standby</strong>
+      </div>
+      <div class="stat-pill liquid-card">
+        <span class="stat-label">SORT BY</span>
+        <select id="sort-select" class="glass-select">
+          <option value="rank">Chart Rank</option>
+          <option value="title">Title (A–Z)</option>
+          <option value="artist">Artist (A–Z)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Tracks Grid -->
+    <section class="tracks-section">
+      <div class="section-head">
+        <h2 class="section-title refract-word" id="grid-heading">Trending Across Uganda & The Globe</h2>
+        <button id="refresh-btn" class="pill-btn">↻ Sync Live Charts</button>
+      </div>
+
+      <div id="tracks-grid" class="tracks-grid">
+        <!-- Dynamically injected track cards -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Apple Liquid Glass Dynamic Dock Player -->
+  <footer class="player-dock liquid-card" id="player-dock">
+    <div class="dock-left">
+      <div class="dock-art-morph" id="dock-art-wrap">
+        <img id="dock-img" src="" alt="Now Playing" />
+      </div>
+      <div class="dock-info">
+        <div id="dock-title" class="dock-title refract-word">Select a track</div>
+        <div id="dock-artist" class="dock-artist">Tap any song to trigger dynamic glass</div>
+      </div>
+    </div>
+
+    <div class="dock-center">
+      <div class="dock-controls">
+        <button id="prev-btn" class="icon-btn" aria-label="Previous track">⏮</button>
+        <button id="play-pause-btn" class="morph-play-circle" aria-label="Play or pause">▶</button>
+        <button id="next-btn" class="icon-btn" aria-label="Next track">⏭</button>
+      </div>
+      <div class="progress-wrap">
+        <span id="current-time" class="mono-time">0:00</span>
+        <input id="seek-bar" type="range" min="0" max="100" value="0" />
+        <span id="total-time" class="mono-time">0:30</span>
+      </div>
+    </div>
+
+    <div class="dock-right">
+      <div class="visualizer" id="visualizer" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <input id="volume-bar" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume" />
+    </div>
+  </footer>
+
+  <audio id="audio-player" crossorigin="anonymous"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
