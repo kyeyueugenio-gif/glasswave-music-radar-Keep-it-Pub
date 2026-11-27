@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MUZIKIGLASS v3 — Butter-Smooth Music + Live FM Radio + Synced Lyrics
+   MUZIKIGLASS v4 — Instant Music + Working HTTPS Radio + Dual Lyrics + 3-Slide Tray
    ========================================================================== */
 
 const EXPRESSIVE_PALETTES = [
@@ -10,32 +10,19 @@ const EXPRESSIVE_PALETTES = [
   { name: "Pearl Crimson", primary: "#fb7185", primaryContainer: "rgba(251, 113, 133, 0.24)", secondary: "#fcd34d", secondaryContainer: "rgba(252, 211, 77, 0.2)", tertiary: "#38bdf8" },
 ];
 
+// Fast batched queries (prevents API throttling)
 const QUERY_PRESETS = {
-  trending: {
-    uganda: ["Joshua Baraka", "Elijah Kitaka", "Azawi", "Mudra Uganda", "Winnie Nwagi", "Lydia Jazmine"],
-    global: ["Kendrick Lamar GNX", "Sabrina Carpenter", "ROSE Bruno Mars", "Tems", "Asake", "Billie Eilish"],
-  },
-  ugaflow: {
-    uganda: ["Joshua Baraka", "Elijah Kitaka", "Fik Fameica", "Azawi", "Vinka", "B2C Uganda"],
-    global: ["Ayra Starr", "Rema", "Wizkid Morayo", "Burna Boy"],
-  },
-  amapiano: {
-    uganda: ["Sheebah", "Spice Diana", "Pallaso"],
-    global: ["Tyla", "Tyler ICU", "Uncle Waffles", "Kabza De Small"],
-  },
-  globalpop: {
-    uganda: ["Joshua Baraka", "Kenneth Mugabi", "Abeeka Band"],
-    global: ["Lady Gaga", "Sabrina Carpenter", "The Weeknd", "Ariana Grande"],
-  },
-  hiphop: {
-    uganda: ["Fik Fameica", "Navio", "Gravity Omutujju", "Feffe Bussi"],
-    global: ["Kendrick Lamar", "Central Cee", "Travis Scott", "Doechii"],
-  },
+  trending: { uganda: ["Joshua Baraka", "Azawi Uganda"], global: ["Sabrina Carpenter", "Kendrick Lamar"] },
+  ugaflow: { uganda: ["Elijah Kitaka", "Fik Fameica"], global: ["Ayra Starr", "Burna Boy"] },
+  amapiano: { uganda: ["Sheebah", "Spice Diana"], global: ["Tyla", "Kabza De Small"] },
+  globalpop: { uganda: ["Kenneth Mugabi", "Lydia Jazmine"], global: ["Lady Gaga", "The Weeknd"] },
+  hiphop: { uganda: ["Navio", "Gravity Omutujju"], global: ["Kendrick Lamar", "Travis Scott"] },
 };
 
-const FALLBACK_TRACKS = [
+// Instant-render catalog so music ALWAYS shows immediately
+const INITIAL_CATALOG = [
   {
-    id: "ug-new-1",
+    id: "ug-1",
     title: "Nana",
     artist: "Joshua Baraka",
     album: "Growing Pains",
@@ -47,7 +34,7 @@ const FALLBACK_TRACKS = [
     releaseYear: "2024",
   },
   {
-    id: "gl-new-1",
+    id: "gl-1",
     title: "Die With A Smile",
     artist: "Lady Gaga & Bruno Mars",
     album: "Single",
@@ -58,41 +45,91 @@ const FALLBACK_TRACKS = [
     releaseDate: "2024-08-16",
     releaseYear: "2024",
   },
+  {
+    id: "ug-2",
+    title: "Party",
+    artist: "Azawi",
+    album: "Sankofa",
+    genre: "Afrobeat",
+    region: "uganda",
+    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1c/71/23/1c7123c7-b9e2-96d2-7bc6-d19b2fa9d490/196589626516.jpg/600x600bb.jpg",
+    previewUrl: "",
+    releaseDate: "2023-10-10",
+    releaseYear: "2023",
+  },
+  {
+    id: "gl-2",
+    title: "Water",
+    artist: "Tyla",
+    album: "TYLA",
+    genre: "Amapiano",
+    region: "global",
+    artwork: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/aa/52/4d/aa524dff-952e-d77e-00f7-e7d06b5c1a49/196871319959.jpg/600x600bb.jpg",
+    previewUrl: "",
+    releaseDate: "2023-07-28",
+    releaseYear: "2023",
+  },
 ];
 
-// Curated HTTPS Radio Fallbacks in case Radio-Browser is busy
-const FALLBACK_RADIO = [
+// Reliable HTTPS Live Radio Stations (work directly on GitHub Pages HTTPS)
+const RELIABLE_RADIO = [
   {
-    id: "rad-1",
-    title: "Capital FM 91.3 Kampala",
-    artist: "Live Uganda FM",
-    album: "Live Broadcast",
-    genre: "Uganda Hit Radio",
+    id: "rad-somafm-groove",
+    title: "SomaFM Groove Salad",
+    artist: "Global Ambient & Chill Beats",
+    album: "Live 24/7 FM",
+    genre: "Chill / Beats",
     region: "radio",
     isRadio: true,
-    artwork: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
-    previewUrl: "https://capitalfm.atunwadigital.streamguys1.com/capitalfm",
+    artwork: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80",
+    previewUrl: "https://ice1.somafm.com/groovesalad-128-mp3",
     releaseDate: "2026-01-01",
     releaseYear: "LIVE",
   },
   {
-    id: "rad-2",
-    title: "SomaFM Groove Salad",
-    artist: "Global Chill & Beats",
-    album: "Live Broadcast",
-    genre: "Global Radio",
+    id: "rad-rp-main",
+    title: "Radio Paradise Global Mix",
+    artist: "World Eclectic & Indie",
+    album: "Live 24/7 FM",
+    genre: "Global Mix",
     region: "radio",
     isRadio: true,
-    artwork: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80",
-    previewUrl: "https://ice2.somafm.com/groovesalad-128-mp3",
+    artwork: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
+    previewUrl: "https://stream.radioparadise.com/mp3-128",
+    releaseDate: "2026-01-01",
+    releaseYear: "LIVE",
+  },
+  {
+    id: "rad-somafm-lush",
+    title: "SomaFM Lush Vocals",
+    artist: "Global Electronic & Vocal",
+    album: "Live 24/7 FM",
+    genre: "Vocal Chill",
+    region: "radio",
+    isRadio: true,
+    artwork: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80",
+    previewUrl: "https://ice1.somafm.com/lush-128-mp3",
+    releaseDate: "2026-01-01",
+    releaseYear: "LIVE",
+  },
+  {
+    id: "rad-somafm-beat",
+    title: "SomaFM Beat Blender",
+    artist: "Deep House & Downtempo",
+    album: "Live 24/7 FM",
+    genre: "House / Dance",
+    region: "radio",
+    isRadio: true,
+    artwork: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80",
+    previewUrl: "https://ice1.somafm.com/beatblender-128-mp3",
     releaseDate: "2026-01-01",
     releaseYear: "LIVE",
   },
 ];
 
 const state = {
-  tracks: [],
-  radioStations: [],
+  tracks: [...INITIAL_CATALOG],
+  radioStations: [...RELIABLE_RADIO],
   filteredTracks: [],
   likedMap: JSON.parse(localStorage.getItem("muzikiglass_liked") || "{}"),
   ytApiKey: localStorage.getItem("muzikiglass_yt_key") || "",
@@ -113,6 +150,7 @@ const tracksGrid = document.getElementById("tracks-grid");
 const audioPlayer = document.getElementById("audio-player");
 const playerDock = document.getElementById("player-dock");
 const trayBackdrop = document.getElementById("tray-backdrop");
+const trayCarousel = document.getElementById("tray-carousel");
 const ytModalBackdrop = document.getElementById("yt-modal-backdrop");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const trayPlayBtn = document.getElementById("tray-play-btn");
@@ -125,14 +163,24 @@ const trayYtIframe = document.getElementById("tray-yt-iframe");
 const trayArt = document.getElementById("tray-art");
 
 /* ==========================================================================
-   1. Butter-Smooth Single-Card Pointer Lighting + Palette + Toast
+   1. Helpers: Fetch Timeout, Toast, Lighting & M3 Palette
    ========================================================================== */
+async function fetchWithTimeout(url, ms = 5500) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { signal: ctrl.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
   toast.classList.add("show");
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 2300);
 }
 
 function attachGlassLighting() {
@@ -167,14 +215,13 @@ document.getElementById("theme-cycle-btn").addEventListener("click", () => {
 });
 
 /* ==========================================================================
-   2. Music + Live Radio + YouTube Fetchers
+   2. Fast Non-Throttled Music & Radio Fetchers
    ========================================================================== */
 async function fetchYouTubeTrending(regionCode, regionTag) {
-  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=${regionCode}&maxResults=12&key=${encodeURIComponent(state.ytApiKey)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("YouTube API error");
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=${regionCode}&maxResults=10&key=${encodeURIComponent(state.ytApiKey)}`;
+  const res = await fetchWithTimeout(url);
+  if (!res.ok) throw new Error("YT API error");
   const data = await res.json();
-
   return (data.items || []).map((v) => ({
     id: `yt-${v.id}`,
     ytVideoId: v.id,
@@ -192,10 +239,9 @@ async function fetchYouTubeTrending(regionCode, regionTag) {
 
 async function fetchYouTubeSearch(query, regionTag) {
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&order=date&maxResults=8&q=${encodeURIComponent(query)}&key=${encodeURIComponent(state.ytApiKey)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("YouTube Search API error");
+  const res = await fetchWithTimeout(url);
+  if (!res.ok) throw new Error("YT Search error");
   const data = await res.json();
-
   return (data.items || []).map((v) => ({
     id: `yt-${v.id.videoId}`,
     ytVideoId: v.id.videoId,
@@ -211,16 +257,16 @@ async function fetchYouTubeSearch(query, regionTag) {
   }));
 }
 
-async function fetchItunesLatest(term, regionTag) {
-  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=10`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("iTunes fetch failed");
+async function fetchItunesBatch(term, regionTag) {
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=12`;
+  const res = await fetchWithTimeout(url);
+  if (!res.ok) throw new Error("iTunes failed");
   const data = await res.json();
 
   return (data.results || [])
-    .filter((item) => item.trackName && item.artworkUrl100)
+    .filter((item) => item.trackName && item.artworkUrl100 && item.previewUrl)
     .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0))
-    .slice(0, 3)
+    .slice(0, 6)
     .map((item) => ({
       id: String(item.trackId),
       title: item.trackName,
@@ -229,54 +275,57 @@ async function fetchItunesLatest(term, regionTag) {
       genre: item.primaryGenreName || "Music",
       region: regionTag,
       artwork: item.artworkUrl100.replace("100x100bb", "600x600bb"),
-      previewUrl: item.previewUrl || "",
+      previewUrl: item.previewUrl,
       releaseDate: item.releaseDate || "2024-01-01",
       releaseYear: item.releaseDate ? item.releaseDate.slice(0, 4) : "2025",
     }));
 }
 
 async function fetchLiveRadioStations() {
-  try {
-    const [ugRes, glRes] = await Promise.all([
-      fetch("https://de1.api.radio-browser.info/json/stations/search?countrycode=UG&is_https=true&hidebroken=true&order=clickcount&reverse=true&limit=10"),
-      fetch("https://de1.api.radio-browser.info/json/stations/search?is_https=true&hidebroken=true&order=votes&reverse=true&limit=8"),
-    ]);
+  const endpoints = [
+    "https://all.api.radio-browser.info/json/stations/search?countrycode=UG&hidebroken=true&order=clickcount&reverse=true&limit=12",
+    "https://de1.api.radio-browser.info/json/stations/search?countrycode=UG&hidebroken=true&order=clickcount&reverse=true&limit=12",
+  ];
 
-    const ugData = ugRes.ok ? await ugRes.json() : [];
-    const glData = glRes.ok ? await glRes.json() : [];
+  for (const url of endpoints) {
+    try {
+      const res = await fetchWithTimeout(url, 4500);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const httpsUg = data
+        .filter((s) => (s.url_resolved || "").startsWith("https://"))
+        .map((s) => ({
+          id: `rad-${s.stationuuid}`,
+          title: s.name.trim(),
+          artist: `Uganda FM • ${s.bitrate || 128}kbps`,
+          album: "Live Broadcast",
+          genre: (s.tags || "Uganda FM").split(",")[0] || "Radio",
+          region: "radio",
+          isRadio: true,
+          artwork: s.favicon && s.favicon.startsWith("https://")
+            ? s.favicon
+            : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
+          previewUrl: s.url_resolved,
+          releaseDate: "2026-01-01",
+          releaseYear: "LIVE",
+        }));
 
-    const mapStation = (s, label) => ({
-      id: `rad-${s.stationuuid}`,
-      title: s.name.trim(),
-      artist: s.country ? `${s.country} • ${s.bitrate || 128}kbps` : label,
-      album: "Live FM Stream",
-      genre: (s.tags || label).split(",")[0] || "Radio",
-      region: "radio",
-      isRadio: true,
-      artwork: s.favicon && s.favicon.startsWith("https://")
-        ? s.favicon
-        : "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80",
-      previewUrl: s.url_resolved || s.url,
-      releaseDate: "2026-01-01",
-      releaseYear: "LIVE",
-    });
-
-    const combined = [
-      ...ugData.filter((s) => (s.url_resolved || "").startsWith("https://")).map((s) => mapStation(s, "Uganda FM")),
-      ...glData.filter((s) => (s.url_resolved || "").startsWith("https://")).map((s) => mapStation(s, "Global FM")),
-    ];
-
-    state.radioStations = combined.length ? combined : FALLBACK_RADIO;
-  } catch {
-    state.radioStations = FALLBACK_RADIO;
+      if (httpsUg.length) {
+        state.radioStations = [...httpsUg, ...RELIABLE_RADIO];
+        if (state.region === "radio") filterAndRender();
+        return;
+      }
+    } catch {
+      // Try next mirror silently
+    }
   }
+  state.radioStations = [...RELIABLE_RADIO];
 }
 
 async function loadCharts() {
   const statusEl = document.getElementById("live-status-text");
   const sourceEl = document.getElementById("stat-source");
-  statusEl.textContent = "SYNCING LATEST UGANDA & GLOBAL MUSIC...";
-  tracksGrid.innerHTML = `<div class="liquid-card" style="padding:20px;border-radius:22px;">Syncing latest waves...</div>`;
+  statusEl.textContent = "UPDATING LIVE CHARTS...";
 
   try {
     let fetched = [];
@@ -301,19 +350,18 @@ async function loadCharts() {
       sourceEl.textContent = "Latest + Live Radio";
       if (state.searchQuery.trim()) {
         const q = state.searchQuery.trim();
-        const [ugRes, glRes] = await Promise.all([
-          fetchItunesLatest(`${q} Uganda`, "uganda"),
-          fetchItunesLatest(q, "global"),
+        const results = await Promise.allSettled([
+          fetchItunesBatch(`${q} Uganda`, "uganda"),
+          fetchItunesBatch(q, "global"),
         ]);
-        fetched = [...ugRes, ...glRes];
+        results.forEach((r) => { if (r.status === "fulfilled") fetched.push(...r.value); });
       } else {
         const preset = QUERY_PRESETS[state.genre] || QUERY_PRESETS.trending;
-        const ugPromises = preset.uganda.map((a) => fetchItunesLatest(a, "uganda"));
-        const glPromises = preset.global.map((a) => fetchItunesLatest(a, "global"));
-        const results = await Promise.allSettled([...ugPromises, ...glPromises]);
-        results.forEach((r) => {
-          if (r.status === "fulfilled") fetched.push(...r.value);
-        });
+        const results = await Promise.allSettled([
+          ...preset.uganda.map((a) => fetchItunesBatch(a, "uganda")),
+          ...preset.global.map((a) => fetchItunesBatch(a, "global")),
+        ]);
+        results.forEach((r) => { if (r.status === "fulfilled") fetched.push(...r.value); });
       }
     }
 
@@ -324,22 +372,24 @@ async function loadCharts() {
       return true;
     });
 
-    const ugList = unique.filter((t) => t.region === "uganda");
-    const glList = unique.filter((t) => t.region === "global");
-    const interleaved = [];
-    const maxLen = Math.max(ugList.length, glList.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (ugList[i]) interleaved.push(ugList[i]);
-      if (glList[i]) interleaved.push(glList[i]);
+    if (unique.length) {
+      const ugList = unique.filter((t) => t.region === "uganda");
+      const glList = unique.filter((t) => t.region === "global");
+      const mixed = [];
+      const maxLen = Math.max(ugList.length, glList.length);
+      for (let i = 0; i < maxLen; i++) {
+        if (ugList[i]) mixed.push(ugList[i]);
+        if (glList[i]) mixed.push(glList[i]);
+      }
+      state.tracks = mixed;
+      statusEl.textContent = state.ytApiKey
+        ? "YOUTUBE MUSIC LIVE • UGANDA & GLOBAL"
+        : "LATEST RELEASES • KAMPALA TO THE WORLD";
+    } else {
+      statusEl.textContent = "CURATED HITS • READY TO PLAY";
     }
-
-    state.tracks = interleaved.length ? interleaved : FALLBACK_TRACKS;
-    statusEl.textContent = state.ytApiKey
-      ? "YOUTUBE MUSIC LIVE • UGANDA & GLOBAL"
-      : "LATEST RELEASES • KAMPALA TO THE WORLD";
-  } catch (err) {
-    state.tracks = FALLBACK_TRACKS;
-    statusEl.textContent = "OFFLINE PULSE • CURATED CATALOG";
+  } catch {
+    statusEl.textContent = "CURATED HITS • READY TO PLAY";
   }
 
   updateLikedCounter();
@@ -347,10 +397,10 @@ async function loadCharts() {
 }
 
 /* ==========================================================================
-   3. Real-Time Synced Lyrics Engine (LRCLIB)
+   3. Dual Lyrics Engine (LRCLIB Synced + lyrics.ovh Fallback)
    ========================================================================== */
 function cleanTrackName(name) {
-  return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].trim();
+  return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].split("feat")[0].trim();
 }
 
 function parseLrc(lrcText) {
@@ -368,34 +418,35 @@ function parseLrc(lrcText) {
 
 async function loadLyricsForTrack(track) {
   const box = document.getElementById("tray-lyrics-box");
+  const status = document.getElementById("lyrics-status");
   state.syncedLines = [];
   state.activeLyricIdx = -1;
 
   if (!track || track.isRadio) {
-    box.innerHTML = `<p class="lyrics-placeholder">📻 Live FM Radio Broadcast — lyrics are shown for music tracks.</p>`;
+    status.textContent = "Live FM";
+    box.innerHTML = `<p class="lyrics-placeholder">📻 Live FM Radio Broadcast.<br/>Switch to any song to read lyrics!</p>`;
     return;
   }
 
-  box.innerHTML = `<p class="lyrics-placeholder">Searching synced lyrics for "${track.title}"...</p>`;
+  status.textContent = "Searching...";
+  box.innerHTML = `<p class="lyrics-placeholder">Finding lyrics for "${track.title}"...</p>`;
+
+  const cleanTitle = cleanTrackName(track.title);
+  const cleanArtist = cleanTrackName(track.artist);
 
   try {
-    const cleanTitle = cleanTrackName(track.title);
-    const cleanArtist = cleanTrackName(track.artist);
-    let res = await fetch(`https://lrclib.net/api/get?track_name=${encodeURIComponent(cleanTitle)}&artist_name=${encodeURIComponent(cleanArtist)}`);
+    // 1. Try LRCLIB (supports synced timestamps)
+    let res = await fetchWithTimeout(`https://lrclib.net/api/get?track_name=${encodeURIComponent(cleanTitle)}&artist_name=${encodeURIComponent(cleanArtist)}`, 4500);
     let data = res.ok ? await res.json() : null;
 
     if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-      const searchRes = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(`${cleanTitle} ${cleanArtist}`)}`);
-      const list = searchRes.ok ? await searchRes.json() : [];
+      const sRes = await fetchWithTimeout(`https://lrclib.net/api/search?q=${encodeURIComponent(`${cleanTitle} ${cleanArtist}`)}`, 4500);
+      const list = sRes.ok ? await sRes.json() : [];
       data = list[0] || null;
     }
 
-    if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-      box.innerHTML = `<p class="lyrics-placeholder">No lyrics found in LRCLIB yet for this track. Try opening it on YT Music!</p>`;
-      return;
-    }
-
-    if (data.syncedLyrics) {
+    if (data?.syncedLyrics) {
+      status.textContent = "Synced";
       state.syncedLines = parseLrc(data.syncedLyrics);
       box.innerHTML = "";
       state.syncedLines.forEach((line, idx) => {
@@ -404,15 +455,35 @@ async function loadLyricsForTrack(track) {
         p.dataset.idx = idx;
         p.textContent = line.text;
         p.addEventListener("click", () => {
-          if (audioPlayer.duration) audioPlayer.currentTime = line.time;
+          if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = line.time;
         });
         box.appendChild(p);
       });
-    } else {
-      box.innerHTML = `<div class="lyric-plain">${data.plainLyrics}</div>`;
+      return;
     }
+
+    if (data?.plainLyrics) {
+      status.textContent = "Plain";
+      box.innerHTML = `<div class="lyric-plain">${data.plainLyrics}</div>`;
+      return;
+    }
+
+    // 2. Fallback to lyrics.ovh
+    const ovhRes = await fetchWithTimeout(`https://api.lyrics.ovh/v1/${encodeURIComponent(cleanArtist)}/${encodeURIComponent(cleanTitle)}`, 4500);
+    if (ovhRes.ok) {
+      const ovhData = await ovhRes.json();
+      if (ovhData.lyrics) {
+        status.textContent = "Lyrics";
+        box.innerHTML = `<div class="lyric-plain">${ovhData.lyrics}</div>`;
+        return;
+      }
+    }
+
+    status.textContent = "Unavailable";
+    box.innerHTML = `<p class="lyrics-placeholder">Lyrics aren’t indexed yet for "${track.title}".<br/>Tap <strong>↗ YT</strong> at the top to view on YouTube Music.</p>`;
   } catch {
-    box.innerHTML = `<p class="lyrics-placeholder">Unable to fetch lyrics right now.</p>`;
+    status.textContent = "Offline";
+    box.innerHTML = `<p class="lyrics-placeholder">Could not load lyrics right now.</p>`;
   }
 }
 
@@ -435,7 +506,7 @@ function updateActiveLyric(currentTime) {
 }
 
 /* ==========================================================================
-   4. Filter, Sort & Render
+   4. Filter, Sort & Render Grid
    ========================================================================== */
 function updateLikedCounter() {
   document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length;
@@ -542,7 +613,7 @@ function renderGrid(list) {
 }
 
 /* ==========================================================================
-   5. Playback + Zero-Scroll Tray + Queue/Lyrics Switcher
+   5. Playback + Compact 3-Slide Tray (Player -> Up Next -> Lyrics)
    ========================================================================== */
 function playTrackAtIndex(idx) {
   const track = state.filteredTracks[idx];
@@ -580,9 +651,19 @@ function playTrackAtIndex(idx) {
     if (track.previewUrl) {
       audioPlayer.src = track.previewUrl;
       audioPlayer.volume = Number(volumeBar.value);
-      audioPlayer.play().catch(() => showToast("Stream blocked by station/browser — try another"));
-      state.isPlaying = true;
-      document.getElementById("stat-audio").textContent = track.isRadio ? "🔴 Live Radio" : "Playing 30s";
+      audioPlayer.play()
+        .then(() => {
+          state.isPlaying = true;
+          document.getElementById("stat-audio").textContent = track.isRadio ? "🔴 Live Radio" : "Playing 30s";
+          updatePlayerUI();
+          renderGrid(state.filteredTracks);
+        })
+        .catch(() => {
+          state.isPlaying = false;
+          document.getElementById("stat-audio").textContent = "Stream Unavailable";
+          showToast("Tap another station or press ▶ again");
+          updatePlayerUI();
+        });
     } else {
       state.isPlaying = false;
       document.getElementById("stat-audio").textContent = "Open YT Music";
@@ -603,6 +684,15 @@ function playTrackAtIndex(idx) {
   renderTrayQueue();
 }
 
+audioPlayer.addEventListener("error", () => {
+  const track = state.filteredTracks[state.currentIndex];
+  if (track?.isRadio && state.isPlaying) {
+    state.isPlaying = false;
+    updatePlayerUI();
+    showToast("This radio stream is offline — try SomaFM or Radio Paradise");
+  }
+});
+
 function syncTrayDetails() {
   const track = state.filteredTracks[state.currentIndex];
   if (!track) return;
@@ -610,7 +700,6 @@ function syncTrayDetails() {
   trayArt.src = track.artwork;
   document.getElementById("tray-title").textContent = track.title;
   document.getElementById("tray-artist").textContent = `${track.artist} • ${track.album}`;
-  document.getElementById("tray-mode-badge").textContent = track.isRadio ? "📻 LIVE RADIO" : "NOW PLAYING";
   document.getElementById("tray-region-badge").textContent =
     track.isRadio ? "📻 FM" : track.region === "uganda" ? "🇺🇬 UGANDA" : "🌍 GLOBAL";
   document.getElementById("tray-year-badge").textContent = track.releaseYear;
@@ -655,11 +744,44 @@ function renderTrayQueue() {
       </div>
       <span class="mono-time">${track.isRadio ? "📻" : track.region === "uganda" ? "🇺🇬" : "🌍"}</span>
     `;
-    row.addEventListener("click", () => playTrackAtIndex(idx));
+    row.addEventListener("click", () => {
+      playTrackAtIndex(idx);
+      goToTraySlide(0);
+    });
     frag.appendChild(row);
   });
   listEl.appendChild(frag);
 }
+
+// Slide Navigation (Swipe Left/Right + Top Pills + Swipe Hints)
+function goToTraySlide(slideIndex) {
+  const width = trayCarousel.clientWidth;
+  trayCarousel.scrollTo({ left: width * slideIndex, behavior: "smooth" });
+  updateTraySlideDots(slideIndex);
+}
+
+function updateTraySlideDots(activeIdx) {
+  document.querySelectorAll(".tray-dot").forEach((dot) => {
+    dot.classList.toggle("active", Number(dot.dataset.slide) === activeIdx);
+  });
+}
+
+let slideScrollTimer = 0;
+trayCarousel.addEventListener("scroll", () => {
+  clearTimeout(slideScrollTimer);
+  slideScrollTimer = setTimeout(() => {
+    const idx = Math.round(trayCarousel.scrollLeft / (trayCarousel.clientWidth || 1));
+    updateTraySlideDots(idx);
+  }, 50);
+}, { passive: true });
+
+document.querySelectorAll(".tray-dot").forEach((dot) => {
+  dot.addEventListener("click", () => goToTraySlide(Number(dot.dataset.slide)));
+});
+
+document.querySelectorAll(".swipe-hint").forEach((hint) => {
+  hint.addEventListener("click", () => goToTraySlide(Number(hint.dataset.go)));
+});
 
 function updatePlayerUI() {
   const icon = state.isPlaying ? "⏸" : "▶";
@@ -712,6 +834,7 @@ function openPickerTray() {
   renderTrayQueue();
   trayBackdrop.classList.add("open");
   trayBackdrop.setAttribute("aria-hidden", "false");
+  goToTraySlide(0);
 }
 
 function closePickerTray() {
@@ -721,17 +844,6 @@ function closePickerTray() {
 
 document.getElementById("tray-close-btn").addEventListener("click", closePickerTray);
 trayBackdrop.addEventListener("click", (e) => { if (e.target === trayBackdrop) closePickerTray(); });
-
-// Queue vs Lyrics Tabs inside Tray
-document.querySelectorAll(".picker-tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".picker-tab").forEach((t) => t.classList.remove("active"));
-    tab.classList.add("active");
-    const isLyrics = tab.dataset.pane === "lyrics";
-    document.getElementById("tray-queue-list").classList.toggle("hidden", isLyrics);
-    document.getElementById("tray-lyrics-box").classList.toggle("hidden", !isLyrics);
-  });
-});
 
 trayPlayBtn.addEventListener("click", togglePlayPause);
 document.getElementById("tray-next-btn").addEventListener("click", playNext);
@@ -817,16 +929,12 @@ document.getElementById("yt-clear-btn").addEventListener("click", () => {
 });
 
 document.querySelectorAll(".seg-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
+  btn.addEventListener("click", () => {
     document.querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     state.region = btn.dataset.region;
-
-    if (state.region === "radio" && !state.radioStations.length) {
-      tracksGrid.innerHTML = `<div class="liquid-card" style="padding:20px;border-radius:22px;">Tuning into Live Uganda &amp; Global FM Radio...</div>`;
-      await fetchLiveRadioStations();
-    }
     filterAndRender();
+    if (state.region === "radio") fetchLiveRadioStations();
   });
 });
 
@@ -858,16 +966,18 @@ document.getElementById("search-form").addEventListener("submit", (e) => {
 
 document.getElementById("refresh-btn").addEventListener("click", () => {
   if (state.region === "radio") {
-    fetchLiveRadioStations().then(filterAndRender);
+    fetchLiveRadioStations().then(() => showToast("Radio refreshed!"));
   } else {
     loadCharts();
   }
 });
 
 /* ==========================================================================
-   Boot
+   Boot — Instant Render First, Then Background Live Sync
    ========================================================================== */
 attachGlassLighting();
 applyPalette(0);
-loadCharts();
-fetchLiveRadioStations(); // Pre-load radio stations silently in the background
+updateLikedCounter();
+filterAndRender();      // Renders instantly in 0ms!
+loadCharts();           // Updates with fresh charts in background
+fetchLiveRadioStations();
