@@ -232,7 +232,7 @@ html, body { min-height: 100%; background: var(--bg-canvas); color: var(--ink-pr
 .wavy-scrubber.sm .wavy-thumb { height: 10px; width: 3.5px; }
 .mono-time { font-family: var(--font-mono); font-size: 0.62rem; color: var(--ink-secondary); flex-shrink: 0; }
 
-.player-dock { position: fixed; bottom: 12px; left: 50%; transform: translate3d(-50%, 0, 0); z-index: 50; width: min(620px, calc(100% - 22px)); height: 58px; border-radius: 999px; padding: 6px 12px 6px 8px; display: flex; align-items: center; gap: 11px; cursor: pointer; }
+.player-dock { position: fixed; bottom: 12px; left: 50%; transform: translate3d(-50%, 0, 0); z-index: 50; width: min(640px, calc(100% - 22px)); height: 58px; border-radius: 999px; padding: 6px 12px 6px 8px; display: flex; align-items: center; gap: 11px; cursor: pointer; }
 .dock-art-morph { width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; overflow: hidden; background: var(--well-bg); transition: border-radius 280ms var(--spring-glass); }
 .dock-art-morph.spinning { border-radius: 50%; animation: spinSlow 12s linear infinite; will-change: transform; }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
@@ -243,10 +243,4 @@ html, body { min-height: 100%; background: var(--bg-canvas); color: var(--ink-pr
 .dock-artist { font-size: 0.71rem; color: var(--ink-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dock-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-.custom-vol-control { display: flex; align-items: center; gap: 10px; padding: 5px 10px; border-radius: 999px; background: var(--well-bg); border: 1px solid var(--glass-border); }
-.vol-mute-btn { width: 26px; height: 26px; border: none; border-radius: 50%; background: transparent; color: var(--ink-primary); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
-.vol-mute-btn.muted { color: #FA243C; }
-.vol-svg { width: 16px; height: 16px; }
-.custom-vol-track { --vol: 0.8; position: relative; flex: 1; height: 18px; display: flex; align-items: center; cursor: pointer; touch-action: none; outline: none; }
-.custom-vol-track::before { content: ""; position: absolute; left: 0; right: 0; height: 4px; border-radius: 999px; background: var(--track-rail); }
-.custom-vol-fill { position: relative; width: 100%; height:
+.custom-vol-control { display: flex; align-item
