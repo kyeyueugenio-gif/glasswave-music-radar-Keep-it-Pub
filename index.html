@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MuzikiGlass — Uganda & Global Music + Live FM</title>
+  <title>MuzikiGlass — Live Ugandan FM & Global Music</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
 
-  <!-- Sticky Glass Header (1 of 3 backdrop-filters) -->
+  <!-- 1. Sticky Translucent Header -->
   <header class="glass-nav">
     <div class="nav-top-row">
       <div class="brand">
-        <div class="brand-shape" aria-hidden="true">♪</div>
+        <div class="brand-mark" aria-hidden="true">♪</div>
         <div>
           <span class="greeting-text" id="greeting-text">Good Evening</span>
           <span class="brand-title">MuzikiGlass</span>
@@ -25,20 +25,21 @@
           <circle cx="11" cy="11" r="7"></circle>
           <path d="M21 21l-4.35-4.35"></path>
         </svg>
-        <input id="search-input" type="search" placeholder="Search Joshua Baraka, Azawi, Tems, FM..." autocomplete="off" />
+        <input id="search-input" type="search" placeholder="Search Ugandan FM, artists, or songs..." autocomplete="off" />
         <button type="submit" class="btn-expressive">Search</button>
       </form>
 
       <div class="nav-actions">
-        <button id="yt-api-btn" class="pill-btn yt-pill" title="Connect YouTube Music API">▶ YT API</button>
-        <button id="theme-cycle-btn" class="pill-btn" title="Switch Color Palette">✦ Morph</button>
+        <button id="yt-api-btn" class="pill-btn yt-pill" title="Connect YouTube Music API">YT API</button>
+        <button id="theme-cycle-btn" class="pill-btn" title="Cycle Accent Color">✦ Color</button>
+        <button id="appearance-toggle-btn" class="pill-btn" title="Toggle Light / Dark Mode">☾ Dark</button>
       </div>
     </div>
 
     <div class="nav-filter-row">
       <div class="segmented-glass" role="tablist" aria-label="Content Filter">
         <button class="seg-btn active" data-region="all">All</button>
-        <button class="seg-btn" data-region="radio">FM Radio</button>
+        <button class="seg-btn" data-region="radio">FM Radio (<span id="radio-count">0</span>)</button>
         <button class="seg-btn" data-region="songs">Latest Songs</button>
         <button class="seg-btn" data-region="uganda">Uganda</button>
         <button class="seg-btn" data-region="global">Global</button>
@@ -56,67 +57,63 @@
   </header>
 
   <main class="app-shell">
-    <!-- Restored Expressive Hero Stage (No card blur for 60fps tablet scroll) -->
-    <section class="hero-stage">
+    <!-- Hero Sheet -->
+    <section class="hero-sheet">
       <div class="hero-content">
         <div class="hero-top-row">
           <div class="live-badge">
             <span class="pulse-dot"></span>
             <span id="live-status-text">KAMPALA TO THE WORLD • LIVE CHARTS</span>
           </div>
-          <div class="expressive-tokens-hud" title="Live Material 3 Expressive Tokens">
-            <span class="token-label">M3 EXPRESSIVE</span>
+          <div class="expressive-tokens-hud" title="Active Dynamic Tone">
+            <span class="token-label">DYNAMIC TONE</span>
             <span class="token-dot t-primary"></span>
             <span class="token-dot t-secondary"></span>
-            <span class="token-dot t-tertiary"></span>
           </div>
         </div>
-
         <h1 class="hero-headline">
-          Feel the <span class="glass-accent-text">Liquid Sound</span><br />
-          of Uganda &amp; Global Charts.
+          Feel the <span class="accent-headline">Liquid Sound</span><br />
+          of Uganda &amp; Global Radio.
         </h1>
-
         <p class="hero-copy">
-          Stream fresh <strong>Ugandan &amp; Global music</strong>, tune into <strong>Live FM Radio</strong>, and swipe inside the player tray for <strong>Up Next</strong> &amp; <strong>Synced Lyrics</strong>.
+          Stream <strong>70+ live Ugandan &amp; Global FM stations</strong> alongside the latest music releases, synced lyrics, and adaptive ambient color.
         </p>
       </div>
 
       <aside class="spotlight-card" id="spotlight-card">
         <div class="spotlight-header">
-          <span class="m3-badge">★ FRESH PULSE</span>
+          <span class="m3-badge">★ FEATURED</span>
           <span class="m3-badge tonal" id="spotlight-region">UGANDA</span>
         </div>
         <div class="spotlight-art-wrap">
-          <div class="expressive-scallop-ring" aria-hidden="true"></div>
           <img id="spotlight-img" src="" alt="Featured Track Art" />
         </div>
         <div class="spotlight-meta">
           <h2 id="spotlight-title">Loading...</h2>
           <p id="spotlight-artist">Syncing tracks</p>
         </div>
-        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Latest</button>
+        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Now</button>
       </aside>
     </section>
 
-    <!-- Section 1: Live FM Stations -->
-    <section class="content-section" id="radio-section">
+    <!-- Section 1: Live Ugandan FM & Global Radio -->
+    <section class="content-section sheet-panel" id="radio-section">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Live FM Stations</h2>
-          <p class="section-sub" id="radio-status">Uganda &amp; Global 24/7 Live Streams</p>
+          <h2 class="section-title">Live Ugandan FM &amp; Radio</h2>
+          <p class="section-sub" id="radio-status">Loading live FM streams...</p>
         </div>
         <button id="refresh-radio-btn" class="pill-btn">↻ Refresh FM</button>
       </div>
       <div id="radio-grid" class="radio-grid"></div>
     </section>
 
-    <!-- Section 2: Latest Tracks -->
-    <section class="content-section" id="tracks-section">
+    <!-- Section 2: Fresh Drops -->
+    <section class="content-section sheet-panel" id="tracks-section">
       <div class="section-head">
         <div>
-          <h2 class="section-title" id="grid-heading">Latest Tracks</h2>
-          <p class="section-sub">Fresh Ugandan &amp; Global releases</p>
+          <h2 class="section-title" id="grid-heading">Fresh Drops</h2>
+          <p class="section-sub">Latest Ugandan &amp; Global tracks</p>
         </div>
         <div class="section-tools">
           <select id="sort-select" class="glass-select" aria-label="Sort Tracks">
@@ -132,18 +129,17 @@
     </section>
   </main>
 
-  <!-- Slim Bottom Mini-Player (2 of 3 backdrop-filters) -->
-  <footer class="player-dock" id="player-dock" title="Tap to open player tray">
+  <!-- 2. Slim Bottom Mini-Player -->
+  <footer class="player-dock" id="player-dock" title="Tap to open Now Playing">
     <div class="dock-art-morph" id="dock-art-wrap">
-      <img id="dock-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23181c2b'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ff7a45' font-size='26'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" alt="Now Playing" />
+      <img id="dock-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f2f2f7'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fa243c' font-size='26'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" alt="Now Playing" />
     </div>
 
     <div class="dock-meta-col">
       <div class="dock-text-row">
         <span id="dock-title" class="dock-title">Select a Track or FM</span>
-        <span id="dock-artist" class="dock-artist">Tap to expand player</span>
+        <span id="dock-artist" class="dock-artist">Tap to open player</span>
       </div>
-
       <div class="wavy-row">
         <span id="current-time" class="mono-time">0:00</span>
         <div id="dock-scrubber" class="wavy-scrubber sm" role="slider" tabindex="0" aria-label="Seek audio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -152,8 +148,8 @@
             <svg class="wavy-svg" height="12" aria-hidden="true">
               <defs>
                 <linearGradient id="waveGradDock" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="var(--md-primary)" />
-                  <stop offset="100%" stop-color="var(--md-secondary)" />
+                  <stop offset="0%" stop-color="var(--accent-color)" />
+                  <stop offset="100%" stop-color="var(--accent-secondary)" />
                 </linearGradient>
                 <pattern id="sinePatDock" width="24" height="12" patternUnits="userSpaceOnUse">
                   <path d="M 0 6 Q 6 1.5, 12 6 T 24 6" fill="none" stroke="url(#waveGradDock)" stroke-width="2.5" stroke-linecap="round" />
@@ -182,7 +178,7 @@
     </div>
   </footer>
 
-  <!-- Compact 3-Slide Tray (3 of 3 backdrop-filters) -->
+  <!-- 3. Compact 3-Slide Tray -->
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
     <section class="now-playing-tray" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
       <header class="tray-top">
@@ -198,10 +194,8 @@
       </header>
 
       <div class="tray-carousel" id="tray-carousel">
-        <!-- SLIDE 1: Now Playing -->
         <div class="tray-slide" id="slide-player">
           <div class="tray-media-box">
-            <div class="expressive-scallop-ring tray-ring" aria-hidden="true"></div>
             <img id="tray-art" src="" alt="Album Cover" />
             <iframe id="tray-yt-iframe" class="tray-yt-iframe hidden" allow="autoplay; encrypted-media" allowfullscreen title="YouTube Music Player"></iframe>
           </div>
@@ -233,8 +227,8 @@
                   <svg class="wavy-svg" height="14" aria-hidden="true">
                     <defs>
                       <linearGradient id="waveGradTray" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="var(--md-primary)" />
-                        <stop offset="100%" stop-color="var(--md-secondary)" />
+                        <stop offset="0%" stop-color="var(--accent-color)" />
+                        <stop offset="100%" stop-color="var(--accent-secondary)" />
                       </linearGradient>
                       <pattern id="sinePatTray" width="24" height="14" patternUnits="userSpaceOnUse">
                         <path d="M 0 7 Q 6 1.5, 12 7 T 24 7" fill="none" stroke="url(#waveGradTray)" stroke-width="2.8" stroke-linecap="round" />
@@ -289,7 +283,6 @@
           <div class="swipe-hint" data-go="1">Swipe left for Up Next &amp; Lyrics →</div>
         </div>
 
-        <!-- SLIDE 2: Up Next -->
         <div class="tray-slide" id="slide-queue">
           <div class="slide-subhead">
             <h3>Up Next</h3>
@@ -299,7 +292,6 @@
           <div class="swipe-hint" data-go="2">Swipe left for Lyrics →</div>
         </div>
 
-        <!-- SLIDE 3: Lyrics -->
         <div class="tray-slide" id="slide-lyrics">
           <div class="slide-subhead">
             <h3>Lyrics</h3>
