@@ -7,10 +7,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Static GPU Gradient Backdrop (Zero blur recalculation) -->
   <div class="ambient-canvas" aria-hidden="true"></div>
 
-  <!-- Clean iOS-Inspired Sticky Glass Header -->
+  <!-- Sticky Glass Header (iOS-Inspired) -->
   <header class="glass-nav">
     <div class="nav-top-row">
       <div class="brand">
@@ -39,13 +38,12 @@
         <button id="yt-api-btn" class="header-pill yt-pill" title="Connect YouTube Music API">
           YT API
         </button>
-        <button id="theme-cycle-btn" class="header-pill" title="Switch Color Palette">
+        <button id="theme-cycle-btn" class="header-pill" title="Switch Color Theme">
           ✦ Theme
         </button>
       </div>
     </div>
 
-    <!-- Tactile Segmented Filter Bar -->
     <div class="nav-filter-row">
       <div class="segmented-glass" role="tablist" aria-label="Content Filter">
         <button class="seg-btn active" data-region="all">All</button>
@@ -67,7 +65,7 @@
   </header>
 
   <main class="app-shell">
-    <!-- SECTION 1: Live FM Stations -->
+    <!-- Section 1: Live FM Stations -->
     <section class="content-section" id="radio-section">
       <div class="section-head">
         <div>
@@ -80,7 +78,7 @@
       <div id="radio-grid" class="radio-grid"></div>
     </section>
 
-    <!-- SECTION 2: Latest Tracks -->
+    <!-- Section 2: Latest Tracks -->
     <section class="content-section" id="tracks-section">
       <div class="section-head">
         <div>
@@ -106,7 +104,7 @@
   <!-- Slim Compact Floating Bottom Mini-Player -->
   <footer class="player-dock" id="player-dock" title="Tap to open player tray">
     <div class="dock-art-morph" id="dock-art-wrap">
-      <img id="dock-img" src="" alt="Now Playing" />
+      <img id="dock-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23181c2b'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ff7a45' font-size='26'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" alt="Now Playing" />
     </div>
 
     <div class="dock-meta-col">
@@ -115,7 +113,6 @@
         <span id="dock-artist" class="dock-artist">Tap to expand player</span>
       </div>
 
-      <!-- GPU-Accelerated Wavy Progress Bar (Compact) -->
       <div class="wavy-row">
         <span id="current-time" class="mono-time">0:00</span>
         <div
@@ -130,7 +127,7 @@
         >
           <div class="wavy-track-bg"></div>
           <div class="wavy-elapsed-clip">
-            <svg class="wavy-svg" viewBox="0 0 1200 12" preserveAspectRatio="none" aria-hidden="true">
+            <svg class="wavy-svg" height="12" aria-hidden="true">
               <defs>
                 <linearGradient id="waveGradDock" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stop-color="var(--md-primary)" />
@@ -140,7 +137,7 @@
                   <path d="M 0 6 Q 6 1.5, 12 6 T 24 6" fill="none" stroke="url(#waveGradDock)" stroke-width="2.5" stroke-linecap="round" />
                 </pattern>
               </defs>
-              <rect width="1200" height="12" fill="url(#sinePatDock)" />
+              <rect width="100%" height="12" fill="url(#sinePatDock)" />
             </svg>
           </div>
           <div class="wavy-thumb-rail">
@@ -180,9 +177,7 @@
     </div>
   </footer>
 
-  <!-- =========================================================
-       COMPACT 3-SLIDE TRAY (Now Playing -> Up Next -> Lyrics)
-       ========================================================= -->
+  <!-- Expanded 3-Slide Tray -->
   <div class="tray-backdrop" id="tray-backdrop" aria-hidden="true">
     <section class="now-playing-tray" role="dialog" aria-modal="true" aria-label="Now Playing Tray">
       <header class="tray-top">
@@ -232,7 +227,6 @@
           </div>
 
           <div class="tray-bottom-controls">
-            <!-- Wear OS / M3 Expressive Wavy Scrubber -->
             <div class="wavy-row">
               <span id="tray-current-time" class="mono-time">0:00</span>
               <div
@@ -247,7 +241,7 @@
               >
                 <div class="wavy-track-bg"></div>
                 <div class="wavy-elapsed-clip">
-                  <svg class="wavy-svg" viewBox="0 0 1200 14" preserveAspectRatio="none" aria-hidden="true">
+                  <svg class="wavy-svg" height="14" aria-hidden="true">
                     <defs>
                       <linearGradient id="waveGradTray" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="var(--md-primary)" />
@@ -257,7 +251,7 @@
                         <path d="M 0 7 Q 6 1.5, 12 7 T 24 7" fill="none" stroke="url(#waveGradTray)" stroke-width="2.8" stroke-linecap="round" />
                       </pattern>
                     </defs>
-                    <rect width="1200" height="14" fill="url(#sinePatTray)" />
+                    <rect width="100%" height="14" fill="url(#sinePatTray)" />
                   </svg>
                 </div>
                 <div class="wavy-thumb-rail">
@@ -269,7 +263,6 @@
               <span id="tray-total-time" class="mono-time">0:30</span>
             </div>
 
-            <!-- Transport Controls + 3-State Repeat/Replay -->
             <div class="tray-controls-row">
               <button id="tray-shuffle-btn" class="transport-pill-btn subtle" aria-label="Shuffle" title="Shuffle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -312,7 +305,6 @@
               </button>
             </div>
 
-            <!-- Custom GPU Volume Capsule -->
             <div class="custom-vol-control">
               <button id="volume-mute-btn" class="vol-mute-btn" aria-label="Mute or unmute" title="Mute / Unmute">
                 <svg class="vol-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
