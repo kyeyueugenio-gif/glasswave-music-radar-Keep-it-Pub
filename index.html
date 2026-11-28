@@ -70,7 +70,7 @@
           <div class="expressive-tokens-hud"><span class="token-label">M3 EXPRESSIVE</span><span class="token-dot t-primary"></span><span class="token-dot t-secondary"></span></div>
         </div>
         <h1 class="hero-headline">Feel the <span class="accent-headline">Liquid Sound</span><br />of Uganda &amp; Global Radio.</h1>
-        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>official trending tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
+        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>100+ official trending tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
       </div>
 
       <aside class="spotlight-card" id="spotlight-card">
@@ -234,23 +234,19 @@
   </div>
 
   <!-- YouTube API Key Settings Modal -->
-  <div class="tray-backdrop modal-layer" id="yt-modal-backdrop" aria-hidden="true">
+  <div class="tray-backdrop" id="yt-modal-backdrop" aria-hidden="true">
     <div class="yt-modal liquid-glass-surface" role="dialog" aria-modal="true" aria-label="YouTube API Key Settings">
       <div class="tray-header-row"><span class="m3-badge">▶ API KEY SETTINGS</span><button id="yt-modal-close" class="icon-close-btn">✕</button></div>
-      <p class="modal-desc">Paste your <strong>YouTube Data API v3</strong> key to load 100+ live trending tracks from <strong>Uganda, USA, UK &amp; Nigeria</strong> (<code>chart=mostPopular</code>). Stored only in your browser (<code>localStorage.yt_api_key</code>).</p>
+      <p class="modal-desc">Paste a <strong>YouTube Data API v3</strong> key to override the default key and load live trending charts. Stored in your browser (<code>localStorage.yt_api_key</code>).</p>
       <input id="yt-api-key-input" class="modal-input" type="password" placeholder="Paste YouTube Data API v3 Key (AIza...)" />
       <p id="yt-test-status" class="modal-status"></p>
-      <div class="modal-actions">
-        <button id="yt-save-btn" class="btn-expressive">Test &amp; Save Key</button>
-        <button id="yt-clear-btn" class="pill-btn">Clear Key</button>
-      </div>
+      <div class="modal-actions"><button id="yt-save-btn" class="btn-expressive">Test &amp; Save Key</button><button id="yt-clear-btn" class="pill-btn">Reset Default</button></div>
     </div>
   </div>
 
   <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
   <audio id="audio-player" preload="none"></audio>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script type="module" src="app.js?v=13"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
