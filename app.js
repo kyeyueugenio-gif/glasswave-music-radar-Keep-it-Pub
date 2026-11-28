@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MUZIKIGLASS: Audio-Only Music Engine (Audius Full + Deezer + iTunes) & Country FM
+   MUZIKIGLASS: Reliable Audio-Only Engine (Deezer MP3 + iTunes M4A) & Country FM
    ========================================================================== */
 const ACCENT_PALETTES = [
   { name: "Apple Crimson", primary: "#FA243C", secondary: "#FF6B4A", soft: "rgba(250, 36, 60, 0.14)" },
@@ -16,11 +16,11 @@ const COUNTRY_NAMES = {
 };
 
 const GENRE_QUERIES = {
-  trending: { ug: ["Joshua Baraka", "Azawi", "Eddy Kenzo"], gl: ["Burna Boy", "Tyla", "Sabrina Carpenter"], audiusGenre: "" },
-  ugaflow: { ug: ["Elijah Kitaka", "Fik Fameica", "Winnie Nwagi"], gl: ["Ayra Starr", "Rema", "Asake"], audiusGenre: "Afrobeats" },
-  amapiano: { ug: ["Sheebah", "Spice Diana"], gl: ["Tyla", "Kabza De Small", "Uncle Waffles"], audiusGenre: "Electronic" },
-  globalpop: { ug: ["Kenneth Mugabi", "Lydia Jazmine"], gl: ["Lady Gaga", "The Weeknd", "Ariana Grande"], audiusGenre: "Pop" },
-  hiphop: { ug: ["Navio", "Gravity Omutujju", "Feffe Bussi"], gl: ["Kendrick Lamar", "Travis Scott", "Central Cee"], audiusGenre: "Hip-Hop/Rap" },
+  trending: { ug: ["Joshua Baraka", "Azawi", "Eddy Kenzo"], gl: "chart/0/tracks?limit=80" },
+  ugaflow: { ug: ["Elijah Kitaka", "Fik Fameica", "Winnie Nwagi"], gl: "search?q=Afrobeats&limit=40" },
+  amapiano: { ug: ["Sheebah", "Spice Diana"], gl: "search?q=Amapiano&limit=40" },
+  globalpop: { ug: ["Kenneth Mugabi", "Lydia Jazmine"], gl: "search?q=Pop+2025&limit=40" },
+  hiphop: { ug: ["Navio", "Gravity Omutujju"], gl: "search?q=Hip+Hop&limit=40" },
 };
 
 const GLOBAL_FALLBACK_RADIO = [
@@ -42,7 +42,7 @@ const state = {
   shuffle: false, repeatMode: "off",
   paletteIdx: 0, volume: 0.8, lastVolume: 0.8, isMuted: false, currentSlide: 0,
   syncedLines: [], activeLyricIdx: -1, lyricsOffset: 0,
-  hlsInstance: null, radioStallTimer: 0, audiusHost: "",
+  hlsInstance: null, radioStallTimer: 0,
 };
 
 const radioSection = document.getElementById("radio-section");
@@ -76,7 +76,6 @@ const appearanceBtn = document.getElementById("appearance-toggle-btn");
 const glassModeBtn = document.getElementById("glass-mode-btn");
 const glassSlider = document.getElementById("glass-alpha-slider");
 
-// Never use crossOrigin on <audio> so MP3/Icecast/Audius streams play without CORS failures
 audioPlayer.removeAttribute("crossorigin");
 if (ytPlayerWrap) {
   ytPlayerWrap.classList.add("yt-inactive");
@@ -84,9 +83,7 @@ if (ytPlayerWrap) {
 }
 if (trayArt) trayArt.classList.remove("yt-hidden");
 
-/* ==========================================================================
-   1. Tray Expansion, Glass Lenses & Dynamic Color
-   ========================================================================== */
+/* 1. Tray Expansion, Glass Lenses & Dynamic Color */
 function setPlayerExpanded(expanded, initialSlide = 0) {
   state.isPlayerExpanded = Boolean(expanded);
   if (state.isPlayerExpanded) {
@@ -186,7 +183,7 @@ function extractColorFromArtwork(imgUrl, fallbackTitle) {
 }
 document.getElementById("theme-cycle-btn").addEventListener("click", () => { applyPalette(state.paletteIdx + 1); showToast(`M3 Tone: ${ACCENT_PALETTES[state.paletteIdx].name}`); });
 
-async function fetchWithTimeout(url, ms = 6500) {
+async function fetchWithTimeout(url, ms = 6000) {
   const ctrl = new AbortController(); const id = setTimeout(() => ctrl.abort(), ms);
   try { return await fetch(url, { signal: ctrl.signal }); } finally { clearTimeout(id); }
 }
@@ -195,9 +192,7 @@ function showToast(msg) {
   clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 2400);
 }
 
-/* ==========================================================================
-   2. Volume & Wavy Scrubber Controls
-   ========================================================================== */
+/* 2. Volume & Wavy Scrubber */
 function setVolumeLevel(val, { saveNonZero = true } = {}) {
   const clamped = Math.max(0, Math.min(1, val));
   state.volume = clamped; state.isMuted = clamped === 0;
@@ -231,70 +226,14 @@ function updateProgressVisual(ratio) {
   const c = Math.max(0, Math.min(1, ratio)), clip = `${((1 - c) * 100).toFixed(2)}%`, pct = String(Math.round(c * 100));
   [dockScrubber, trayScrubber].forEach((s) => { s.style.setProperty("--prog", c.toFixed(4)); s.style.setProperty("--clip-right", clip); s.setAttribute("aria-valuenow", pct); });
 }
-function seekToTime(sec) {
-  if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = sec;
-}
-function seekToRatio(ratio) {
-  updateProgressVisual(ratio);
-  if (audioPlayer.duration && isFinite(audioPlayer.duration)) seekToTime(ratio * audioPlayer.duration);
-}
+function seekToTime(sec) { if (audioPlayer.duration && isFinite(audioPlayer.duration)) audioPlayer.currentTime = sec; }
+function seekToRatio(ratio) { updateProgressVisual(ratio); if (audioPlayer.duration && isFinite(audioPlayer.duration)) seekToTime(ratio * audioPlayer.duration); }
 bindGpuSlider(dockScrubber, seekToRatio);
 bindGpuSlider(trayScrubber, seekToRatio);
 
-/* ==========================================================================
-   3. Audio-Only Music Fetchers (Audius Full Tracks + Deezer + iTunes)
-   ========================================================================== */
+/* 3. Rock-Solid Direct MP3/M4A Audio Fetchers (Deezer JSONP + iTunes) */
 function cleanTitle(raw) {
-  return (raw || "")
-    .replace(/(\(|\[)\s*(official\s*(music\s*)?(video|audio|lyric\s*video|visualizer)|lyrics|4k|hd|explicit)\s*(\)|\])/gi, "")
-    .replace(/\s+/g, " ").trim();
-}
-
-async function getAudiusHost() {
-  if (state.audiusHost) return state.audiusHost;
-  try {
-    const res = await fetchWithTimeout("https://api.audius.co", 4500);
-    const json = await res.json();
-    if (json?.data?.length) { state.audiusHost = json.data[0]; return state.audiusHost; }
-  } catch {}
-  return "https://discoveryprovider.audius.co";
-}
-
-function mapAudiusTrack(t, host, regionTag) {
-  return {
-    id: `aud-${t.id}`,
-    title: cleanTitle(t.title),
-    artist: t.user?.name || "Artist",
-    album: t.mood || "Full Audio",
-    genre: t.genre || "Music",
-    region: regionTag,
-    duration: t.duration || 180,
-    artwork: t.artwork?.["480x480"] || t.artwork?.["150x150"] || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80",
-    streamUrl: `${host}/v1/tracks/${t.id}/stream?app_name=MuzikiGlass`,
-    releaseDate: t.release_date || "2025-01-01",
-    releaseYear: (t.release_date || "2025").slice(0, 4),
-  };
-}
-
-async function fetchAudiusTrending(genre = "", regionTag = "global") {
-  try {
-    const host = await getAudiusHost();
-    const gParam = genre ? `&genre=${encodeURIComponent(genre)}` : "";
-    const res = await fetchWithTimeout(`${host}/v1/tracks/trending?limit=40${gParam}&app_name=MuzikiGlass`, 6000);
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json.data || []).filter((t) => t.id && t.title && t.duration >= 60 && t.duration <= 720).map((t) => mapAudiusTrack(t, host, regionTag));
-  } catch { return []; }
-}
-
-async function fetchAudiusSearch(term, regionTag) {
-  try {
-    const host = await getAudiusHost();
-    const res = await fetchWithTimeout(`${host}/v1/tracks/search?query=${encodeURIComponent(term)}&limit=12&app_name=MuzikiGlass`, 5500);
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json.data || []).filter((t) => t.id && t.title && t.duration >= 60 && t.duration <= 720).map((t) => mapAudiusTrack(t, host, regionTag));
-  } catch { return []; }
+  return (raw || "").replace(/(\(|\[)\s*(official\s*(music\s*)?(video|audio|lyric\s*video|visualizer)|lyrics|4k|hd|explicit)\s*(\)|\])/gi, "").replace(/\s+/g, " ").trim();
 }
 
 function fetchDeezerJsonp(urlPath, regionTag) {
@@ -305,14 +244,14 @@ function fetchDeezerJsonp(urlPath, regionTag) {
     function cleanup() { clearTimeout(timer); delete window[cb]; script.remove(); }
     window[cb] = (res) => {
       cleanup();
-      resolve((res?.data || []).filter((i) => i.preview && i.title).map((i) => ({
+      resolve((res?.data || []).filter((i) => i.preview && i.preview.startsWith("https://") && i.title).map((i) => ({
         id: `dz-${i.id}`,
         title: cleanTitle(i.title),
         artist: i.artist?.name || "Artist",
         album: i.album?.title || "Single",
         genre: "Chart Hit",
         region: regionTag,
-        duration: i.duration || 180,
+        duration: 30,
         artwork: i.album?.cover_big || i.album?.cover_medium || "",
         streamUrl: i.preview,
         releaseDate: "2025-01-01",
@@ -328,13 +267,13 @@ function fetchDeezerJsonp(urlPath, regionTag) {
 
 async function fetchItunesAudio(term, regionTag) {
   try {
-    const res = await fetchWithTimeout(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=10`, 5000);
+    const res = await fetchWithTimeout(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=20`, 5500);
     if (!res.ok) return [];
     const data = await res.json();
     return (data.results || [])
-      .filter((i) => i.trackName && i.artworkUrl100 && i.previewUrl)
+      .filter((i) => i.trackName && i.artworkUrl100 && i.previewUrl && i.previewUrl.startsWith("https://"))
       .sort((a, b) => new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0))
-      .slice(0, 6)
+      .slice(0, 12)
       .map((i) => ({
         id: `it-${i.trackId}`,
         title: cleanTitle(i.trackName),
@@ -342,7 +281,7 @@ async function fetchItunesAudio(term, regionTag) {
         album: i.collectionName || "Single",
         genre: i.primaryGenreName || "Music",
         region: regionTag,
-        duration: Math.round((i.trackTimeMillis || 180000) / 1000),
+        duration: 30,
         artwork: i.artworkUrl100.replace("100x100bb", "600x600bb"),
         streamUrl: i.previewUrl,
         releaseDate: i.releaseDate || "2024-01-01",
@@ -353,28 +292,25 @@ async function fetchItunesAudio(term, regionTag) {
 
 async function loadCharts() {
   const statusEl = document.getElementById("live-status-text");
-  statusEl.textContent = "SYNCING AUDIO-ONLY CHARTS...";
+  statusEl.textContent = "SYNCING AUDIO CHARTS...";
   try {
     let fetched = [];
     const q = state.searchQuery.trim();
-
     if (q) {
       const results = await Promise.allSettled([
-        fetchAudiusSearch(`${q} Uganda`, "uganda"),
-        fetchAudiusSearch(q, "global"),
-        fetchDeezerJsonp(`search?q=${encodeURIComponent(`${q} Uganda`)}&limit=10`, "uganda"),
-        fetchDeezerJsonp(`search?q=${encodeURIComponent(q)}&limit=20`, "global"),
+        fetchDeezerJsonp(`search?q=${encodeURIComponent(`${q} Uganda`)}&limit=15`, "uganda"),
+        fetchDeezerJsonp(`search?q=${encodeURIComponent(q)}&limit=25`, "global"),
         fetchItunesAudio(`${q} Uganda`, "uganda"),
+        fetchItunesAudio(q, "global"),
       ]);
       results.forEach((r) => { if (r.status === "fulfilled") fetched.push(...r.value); });
     } else {
       const preset = GENRE_QUERIES[state.genre] || GENRE_QUERIES.trending;
       const results = await Promise.allSettled([
-        fetchAudiusTrending(preset.audiusGenre, "global"),
-        fetchDeezerJsonp("chart/0/tracks?limit=60", "global"),
-        ...preset.ug.map((a) => fetchDeezerJsonp(`search?q=${encodeURIComponent(a)}&limit=6`, "uganda")),
-        ...preset.ug.slice(0, 2).map((a) => fetchItunesAudio(a, "uganda")),
-        ...preset.gl.slice(0, 2).map((a) => fetchAudiusSearch(a, "global")),
+        fetchDeezerJsonp(preset.gl, "global"),
+        ...preset.ug.map((a) => fetchDeezerJsonp(`search?q=${encodeURIComponent(a)}&limit=8`, "uganda")),
+        fetchItunesAudio(preset.ug.join(" "), "uganda"),
+        fetchItunesAudio(preset.gl.replace("chart/0/tracks?limit=80", "Burna Boy Tyla"), "global"),
       ]);
       results.forEach((r) => { if (r.status === "fulfilled") fetched.push(...r.value); });
     }
@@ -397,7 +333,7 @@ async function loadCharts() {
         if (gl[i]) mixed.push(gl[i]);
       }
       state.tracks = mixed;
-      statusEl.textContent = `AUDIO-ONLY CHARTS (${unique.length} TRACKS) • UGANDA & GLOBAL`;
+      statusEl.textContent = `AUDIO CHARTS (${unique.length} TRACKS) • UGANDA & GLOBAL`;
     } else {
       statusEl.textContent = "NO AUDIO TRACKS LOADED • TAP SYNC";
     }
@@ -407,9 +343,7 @@ async function loadCharts() {
   applyFiltersAndRender();
 }
 
-/* ==========================================================================
-   4. Country-Categorized FM Radio + sessionStorage + HLS & Watchdog
-   ========================================================================== */
+/* 4. Country-Categorized FM Radio + HLS */
 async function fetchStationsByCountry(code) {
   if (state.radioByCountry[code]?.length) return state.radioByCountry[code];
   const cacheKey = `muzikiglass_fm_${code}`;
@@ -483,19 +417,16 @@ function playAudioUrl(item, urlToPlay, isRetry = false) {
       audioPlayer.volume = state.volume;
       audioPlayer.play().catch(() => {});
     });
-    hls.on(Hls.Events.ERROR, (_, data) => {
-      if (data.fatal) handleAudioFailure(item, isRetry);
-    });
+    hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) handleAudioFailure(item, isRetry); });
   } else {
     audioPlayer.src = urlToPlay;
     audioPlayer.volume = state.volume;
     const p = audioPlayer.play();
     if (p && typeof p.then === "function") {
       p.then(() => {
-        state.isPlaying = true;
-        updatePlayerUI();
-        syncPlayingCardHighlight();
-      }).catch(() => {
+        state.isPlaying = true; updatePlayerUI(); syncPlayingCardHighlight();
+      }).catch((err) => {
+        if (err && err.name === "AbortError") return;
         handleAudioFailure(item, isRetry);
       });
     }
@@ -504,28 +435,19 @@ function playAudioUrl(item, urlToPlay, isRetry = false) {
   state.isPlaying = true;
   if (item.isRadio) {
     state.radioStallTimer = setTimeout(() => {
-      if (state.currentTrackId === item.id && audioPlayer.readyState < 3 && !audioPlayer.paused) {
-        handleAudioFailure(item, isRetry);
-      }
+      if (state.currentTrackId === item.id && audioPlayer.readyState < 3 && !audioPlayer.paused) handleAudioFailure(item, isRetry);
     }, 6000);
   }
 }
 
 function handleAudioFailure(item, isRetry) {
   clearTimeout(state.radioStallTimer);
-  if (!isRetry && item.fallbackUrl) {
-    playAudioUrl(item, item.fallbackUrl, true);
-    return;
-  }
-  state.isPlaying = false;
-  updatePlayerUI();
-  syncPlayingCardHighlight();
-  showToast(item.isRadio ? "Station offline — try another" : "Audio stream blocked — try another track");
+  if (!isRetry && item.fallbackUrl) { playAudioUrl(item, item.fallbackUrl, true); return; }
+  state.isPlaying = false; updatePlayerUI(); syncPlayingCardHighlight();
+  showToast(item.isRadio ? "Station offline — try another" : "Track audio unavailable — try another");
 }
 
-/* ==========================================================================
-   5. Timestamped LRC Lyrics Sync
-   ========================================================================== */
+/* 5. Timestamped LRC Lyrics Sync */
 function cleanTrackName(name) { return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].split("feat")[0].trim(); }
 function parseLrc(lrc) {
   const out = [];
@@ -541,9 +463,9 @@ async function loadLyricsForTrack(track) {
   state.syncedLines = []; state.activeLyricIdx = -1;
   if (!track || track.isRadio) { status.textContent = "Live FM"; box.innerHTML = `<p class="lyrics-placeholder">Live FM broadcast — switch to a music track for synced lyrics.</p>`; return; }
   status.textContent = "Syncing..."; box.innerHTML = `<p class="lyrics-placeholder">Loading synced lyrics for "${track.title}"...</p>`;
-  const t = cleanTrackName(track.title), a = cleanTrackName(track.artist), dur = track.duration ? `&duration=${Math.round(track.duration)}` : "";
+  const t = cleanTrackName(track.title), a = cleanTrackName(track.artist);
   try {
-    let res = await fetchWithTimeout(`https://lrclib.net/api/get?track_name=${encodeURIComponent(t)}&artist_name=${encodeURIComponent(a)}${dur}`, 4500);
+    let res = await fetchWithTimeout(`https://lrclib.net/api/get?track_name=${encodeURIComponent(t)}&artist_name=${encodeURIComponent(a)}`, 4500);
     let data = res.ok ? await res.json() : null;
     if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
       const s = await fetchWithTimeout(`https://lrclib.net/api/search?q=${encodeURIComponent(`${t} ${a}`)}`, 4500);
@@ -586,9 +508,7 @@ document.getElementById("lyric-offset-plus").addEventListener("click", () => {
   document.getElementById("lyric-offset-readout").textContent = `${state.lyricsOffset > 0 ? "+" : ""}${state.lyricsOffset.toFixed(1)}s`;
 });
 
-/* ==========================================================================
-   6. Rendering & Unified Audio-Only Playback Controller
-   ========================================================================== */
+/* 6. Rendering & Audio Playback */
 function updateLikedCounter() { document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length; }
 function toggleLike(track, e) {
   if (e) e.stopPropagation();
@@ -628,7 +548,6 @@ function renderRadioSection() {
   const q = state.searchQuery.trim();
   radioGrid.innerHTML = "";
   const frag = document.createDocumentFragment();
-
   if (state.radioCountry === "ALL") {
     const allList = [];
     COUNTRY_CODES.forEach((code) => {
@@ -643,7 +562,6 @@ function renderRadioSection() {
     radioGrid.appendChild(frag);
     return;
   }
-
   const stations = (state.radioByCountry[state.radioCountry] || []).filter((s) => matchesSearch(s, q));
   if (!stations.length) { radioGrid.innerHTML = `<div class="radio-card"><p>No HTTPS stations found for this filter.</p></div>`; return; }
   stations.forEach((st) => frag.appendChild(createRadioCard(st, stations)));
@@ -675,7 +593,7 @@ function renderTracksSection() {
       <div class="track-cover-wrap"><img src="${track.artwork}" alt="${track.title}" loading="lazy" /><span class="rank-badge">#${idx + 1}</span><span class="region-badge">${track.region === "uganda" ? "UG" : "GLB"}</span><button class="card-like-btn ${isLiked ? "liked" : ""}">${isLiked ? "♥" : "♡"}</button><button class="card-play-fab">${isPlayingThis ? "⏸" : "▶"}</button></div>
       <div class="track-title-row"><h3 class="track-title" title="${track.title}">${track.title}</h3>${eqMarkup}</div>
       <p class="track-artist" title="${track.artist}">${track.artist}</p>
-      <div class="track-footer"><span>${track.genre}</span><span>${track.duration ? formatTime(track.duration) : track.releaseYear}</span></div>`;
+      <div class="track-footer"><span>${track.genre}</span><span>${track.releaseYear}</span></div>`;
     card.querySelector(".card-like-btn").addEventListener("click", (e) => toggleLike(track, e));
     card.addEventListener("click", () => playItem(track, list));
     frag.appendChild(card);
@@ -686,9 +604,7 @@ function renderTracksSection() {
 function applyFiltersAndRender() {
   renderRadioSection();
   renderTracksSection();
-  const radioList = state.radioCountry === "ALL"
-    ? COUNTRY_CODES.flatMap((c) => state.radioByCountry[c] || [])
-    : (state.radioByCountry[state.radioCountry] || []);
+  const radioList = state.radioCountry === "ALL" ? COUNTRY_CODES.flatMap((c) => state.radioByCountry[c] || []) : (state.radioByCountry[state.radioCountry] || []);
   state.activeQueue = state.region === "radio" ? radioList : state.filteredTracks;
   renderSpotlight(state.activeQueue[0] || (state.radioByCountry.UG || GLOBAL_FALLBACK_RADIO)[0]);
   [prevBtn, nextBtn, trayPrevBtn, trayNextBtn].forEach((b) => { b.disabled = state.activeQueue.length === 0; });
@@ -712,7 +628,6 @@ function getCurrentTrack() {
 function playItem(track, queueContext, forceNew = false) {
   if (!track) return;
   if (queueContext) state.activeQueue = queueContext;
-
   if (!forceNew && state.currentTrackId === track.id && state.isPlaying) { togglePlayPause(); return; }
 
   state.currentTrackId = track.id;
@@ -721,26 +636,13 @@ function playItem(track, queueContext, forceNew = false) {
   document.getElementById("dock-title").textContent = track.title;
   document.getElementById("dock-artist").textContent = track.artist;
 
-  if (track.streamUrl) {
-    playAudioUrl(track, track.streamUrl, false);
-  } else {
-    state.isPlaying = false;
-    showToast("No audio URL for this item");
-  }
+  if (track.streamUrl) playAudioUrl(track, track.streamUrl, false);
+  else { state.isPlaying = false; showToast("No audio URL available"); }
 
-  if (track.isRadio) {
-    updateProgressVisual(1);
-    syncTimeReadouts(0, 0, true);
-  } else {
-    updateProgressVisual(0);
-    syncTimeReadouts(0, track.duration || 0, false);
-  }
+  if (track.isRadio) { updateProgressVisual(1); syncTimeReadouts(0, 0, true); }
+  else { updateProgressVisual(0); syncTimeReadouts(0, track.duration || 30, false); }
 
-  syncTrayDetails();
-  loadLyricsForTrack(track);
-  updatePlayerUI();
-  syncPlayingCardHighlight();
-  renderTrayQueue();
+  syncTrayDetails(); loadLyricsForTrack(track); updatePlayerUI(); syncPlayingCardHighlight(); renderTrayQueue();
 }
 
 function syncTimeReadouts(curSec, durSec, isLive = false) {
@@ -761,15 +663,9 @@ function togglePlayPause(e) {
   if (e) e.stopPropagation();
   const track = getCurrentTrack();
   if (!track && state.activeQueue.length) return playItem(state.activeQueue[0], state.activeQueue);
-  if (state.isPlaying) {
-    audioPlayer.pause();
-    state.isPlaying = false;
-  } else if (audioPlayer.src) {
-    audioPlayer.play().catch(() => {});
-    state.isPlaying = true;
-  }
-  updatePlayerUI();
-  syncPlayingCardHighlight();
+  if (state.isPlaying) { audioPlayer.pause(); state.isPlaying = false; }
+  else if (audioPlayer.src) { audioPlayer.play().catch(() => {}); state.isPlaying = true; }
+  updatePlayerUI(); syncPlayingCardHighlight();
 }
 
 function playNext(e) {
@@ -918,15 +814,12 @@ document.querySelectorAll(".country-pill").forEach((pill) => {
   });
 });
 
-/* Audio-Only Mode Notice in API Modal */
 const ytBtn = document.getElementById("yt-api-btn");
 if (ytBtn) {
   ytBtn.textContent = "Audio Mode";
-  ytBtn.addEventListener("click", () => showToast("Audio-Only Mode Active (No Music Videos)"));
+  ytBtn.addEventListener("click", () => showToast("Audio-Only Mode Active (No Videos)"));
 }
-if (ytModalBackdrop) {
-  document.getElementById("yt-modal-close")?.addEventListener("click", () => ytModalBackdrop.classList.remove("open"));
-}
+document.getElementById("yt-modal-close")?.addEventListener("click", () => ytModalBackdrop.classList.remove("open"));
 
 document.querySelectorAll(".seg-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
