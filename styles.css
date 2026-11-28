@@ -326,3 +326,20 @@ html, body { min-height: 100%; background: var(--bg-canvas); color: var(--ink-pr
   .tray-backdrop { padding: 14px; }
   .now-playing-tray { height: min(540px, calc(100dvh - 28px)); padding: 12px 14px; }
 }
+/* Persistent 200x200 Audio-Only YouTube Host (hidden behind .ambient-canvas, never display:none) */
+.yt-bg-audio-host {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  z-index: -2;
+  opacity: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.yt-bg-audio-host iframe {
+  width: 200px;
+  height: 200px;
+  border: 0;
+}
