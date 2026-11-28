@@ -88,7 +88,6 @@ const glassSlider = document.getElementById("glass-alpha-slider");
 
 audioPlayer.removeAttribute("crossorigin");
 
-/* 1. Unified Morphing Player + Glass Lenses + Theme */
 function setPlayerExpanded(expanded, initialSlide = 0) {
   state.isPlayerExpanded = Boolean(expanded);
   if (state.isPlayerExpanded) {
@@ -199,7 +198,7 @@ function showToast(msg) {
   clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 2400);
 }
 
-/* 2. Background Audio-Only YouTube Player + Direct Fallback Audio Recovery */
+/* YouTube Audio Engine + Fallback Recovery (Never Skips!) */
 function loadYouTubeIframeSdk() {
   window.onYouTubeIframeAPIReady = initYtPlayer;
   if (window.YT && window.YT.Player) { initYtPlayer(); return; }
@@ -244,7 +243,6 @@ function initYtPlayer() {
   });
 }
 
-// Plays the exact same song via iTunes/Deezer if YouTube video blocks embedding (never skips!)
 async function resolveDirectAudioForTrack(track) {
   const q = `${track.artist} ${track.title}`.trim();
   const [itList, dzList] = await Promise.all([
@@ -258,7 +256,7 @@ async function resolveDirectAudioForTrack(track) {
     playItem(track, state.activeQueue, true);
   } else {
     state.isPlaying = false; updatePlayerUI(); syncPlayingCardHighlight();
-    showToast(`Could not play "${track.title}"`);
+    showToast(`"${track.title}" restricted on this domain`);
   }
 }
 
@@ -331,7 +329,7 @@ function seekToRatio(ratio) {
 bindGpuSlider(dockScrubber, seekToRatio);
 bindGpuSlider(trayScrubber, seekToRatio);
 
-/* 3. YouTube Charts & Search + iTunes / Deezer Fallback */
+/* Charts & Search */
 function parseIsoDuration(iso) {
   const m = (iso || "").match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   return m ? (Number(m[1] || 0) * 3600) + (Number(m[2] || 0) * 60) + Number(m[3] || 0) : 0;
@@ -480,8 +478,8 @@ async function loadCharts() {
 
     if (!fetched.length) {
       const res = await Promise.allSettled([
-        fetchItunesAudio(q ? `${q} Uganda` : "Joshua Baraka Azawi Eddy Kenzo", "uganda"),
-        fetchItunesAudio(q || "Burna Boy Tyla Sabrina Carpenter", "global"),
+        fetchItunesAudio(q ? `${q} Uganda` : "Joshua Baraka", "uganda"),
+        fetchItunesAudio(q || "Burna Boy", "global"),
       ]);
       res.forEach((r) => { if (r.status === "fulfilled") fetched.push(...r.value); });
     }
@@ -503,7 +501,7 @@ async function loadCharts() {
   applyFiltersAndRender();
 }
 
-/* 4. Country-Categorized FM Radio + HLS */
+/* Country-Categorized FM Radio + HLS */
 async function fetchStationsByCountry(code) {
   if (state.radioByCountry[code]?.length) return state.radioByCountry[code];
   const cacheKey = `muzikiglass_fm_${code}`;
@@ -591,7 +589,7 @@ function handleRadioFailure(station, isRetry) {
   showToast("Station offline — try another");
 }
 
-/* 5. Timestamped LRC Lyrics Sync */
+/* Timestamped LRC Lyrics Sync */
 function cleanTrackName(name) { return name.replace(/\(.*?\)|\[.*?\]/g, "").split("-")[0].split("feat")[0].trim(); }
 function parseLrc(lrc) {
   const out = [];
@@ -652,7 +650,7 @@ document.getElementById("lyric-offset-plus").addEventListener("click", () => {
   document.getElementById("lyric-offset-readout").textContent = `${state.lyricsOffset > 0 ? "+" : ""}${state.lyricsOffset.toFixed(1)}s`;
 });
 
-/* 6. Rendering, Search-First Layout & Zero-Flicker Playback */
+/* Rendering, Search-First Layout & Zero-Flicker Playback */
 function updateLikedCounter() { document.getElementById("liked-count").textContent = Object.keys(state.likedMap).length; }
 function toggleLike(track, e) {
   if (e) e.stopPropagation();
@@ -660,7 +658,6 @@ function toggleLike(track, e) {
   else { state.likedMap[track.id] = track; showToast("Saved to Liked ♥"); }
   localStorage.setItem("muzikiglass_liked", JSON.stringify(state.likedMap));
   updateLikedCounter(); syncTrayDetails();
-  // Update like icon in place without rebuilding the grid (zero flicker!)
   document.querySelectorAll(`[data-track-id="${track.id}"] .card-like-btn`).forEach((b) => {
     const liked = Boolean(state.likedMap[track.id]);
     b.classList.toggle("liked", liked);
@@ -678,7 +675,7 @@ const eqMarkup = `<span class="eq-mini" aria-hidden="true"><span></span><span></
 
 function createRadioCard(st, queue) {
   const card = document.createElement("article");
-  card.className = `radio-card${state.currentTrackId === st.id && state.isPlaying ? " playing" : ""}`;
+  card.className = `radio-card glass-tile${state.currentTrackId === st.id && state.isPlaying ? " playing" : ""}`;
   card.dataset.trackId = st.id;
   card.innerHTML = `<img class="radio-thumb" src="${st.artwork}" alt="${st.title}" loading="lazy" /><div class="radio-info"><div class="radio-title-row"><h3>${st.title}</h3>${eqMarkup}</div><p>${st.artist}</p></div><span class="freq-badge"><span class="live-dot"></span>${st.freqLabel || "LIVE"}</span>`;
   card.addEventListener("click", () => playItem(st, queue));
@@ -707,7 +704,7 @@ function renderRadioSection() {
     return;
   }
   const stations = (state.radioByCountry[state.radioCountry] || []).filter((s) => matchesSearch(s, q));
-  if (!stations.length) { radioGrid.innerHTML = `<div class="radio-card"><p>No matching FM stations.</p></div>`; return; }
+  if (!stations.length) { radioGrid.innerHTML = `<div class="radio-card glass-tile"><p>No matching FM stations.</p></div>`; return; }
   stations.forEach((st) => frag.appendChild(createRadioCard(st, stations)));
   radioGrid.appendChild(frag);
 }
@@ -728,13 +725,13 @@ function renderTracksSection() {
 
   state.filteredTracks = list;
   tracksGrid.innerHTML = "";
-  if (!list.length) { tracksGrid.innerHTML = `<div class="track-card"><p style="font-size:0.85rem;color:var(--ink-secondary);">No matching songs in current view — press Search to query full catalog.</p></div>`; return; }
+  if (!list.length) { tracksGrid.innerHTML = `<div class="track-card glass-tile"><p style="font-size:0.85rem;color:var(--ink-secondary);">No matching songs in current view — press Search to query full catalog.</p></div>`; return; }
   const frag = document.createDocumentFragment();
   list.forEach((track, idx) => {
     const isPlayingThis = state.currentTrackId === track.id && state.isPlaying;
     const isLiked = Boolean(state.likedMap[track.id]);
     const card = document.createElement("article");
-    card.className = `track-card${isPlayingThis ? " playing" : ""}`;
+    card.className = `track-card glass-tile${isPlayingThis ? " playing" : ""}`;
     card.dataset.trackId = track.id;
     card.innerHTML = `
       <div class="track-cover-wrap"><img src="${track.artwork}" alt="${track.title}" loading="lazy" /><span class="rank-badge">#${idx + 1}</span><span class="region-badge">${track.region === "uganda" ? "UG" : "GLB"}</span><button class="card-like-btn ${isLiked ? "liked" : ""}">${isLiked ? "♥" : "♡"}</button><button class="card-play-fab">${isPlayingThis ? "⏸" : "▶"}</button></div>
@@ -817,11 +814,7 @@ function playItem(track, queueContext, forceNew = false) {
     state.isPlaying = true; updateProgressVisual(0); syncTimeReadouts(0, track.duration || 30, false);
   }
 
-  syncTrayDetails();
-  loadLyricsForTrack(track);
-  updatePlayerUI();
-  syncPlayingCardHighlight();
-  syncQueueActiveClass();
+  syncTrayDetails(); loadLyricsForTrack(track); updatePlayerUI(); syncPlayingCardHighlight(); syncQueueActiveClass();
 }
 
 function syncTimeReadouts(curSec, durSec, isLive = false) {
@@ -863,4 +856,71 @@ function playPrev(e) {
   if (!state.activeQueue.length) return;
   const cur = state.activeEngine === "youtube" && state.ytReady ? (state.ytPlayer.getCurrentTime?.() || 0) : audioPlayer.currentTime;
   if (cur > 3 && !getCurrentTrack()?.isRadio) { seekToTime(0); return; }
-  con
+  const idx = state.activeQueue.findIndex((t) => t.id === state.currentTrackId);
+  playItem(state.activeQueue[(idx - 1 + state.activeQueue.length) % state.activeQueue.length], state.activeQueue, true);
+}
+
+function handleTrackEnded() {
+  if (state.repeatMode === "one") { seekToTime(0); if (state.activeEngine === "youtube") state.ytPlayer.playVideo(); else audioPlayer.play().catch(() => {}); }
+  else if (state.repeatMode === "all" || state.activeQueue.length > 1) playNext();
+  else { state.isPlaying = false; updatePlayerUI(); syncPlayingCardHighlight(); }
+}
+
+repeatBtn.addEventListener("click", () => {
+  const order = ["off", "all", "one"];
+  state.repeatMode = order[(order.indexOf(state.repeatMode) + 1) % order.length];
+  repeatBtn.classList.toggle("active-toggle", state.repeatMode !== "off");
+  repeatOneBadge.classList.toggle("hidden", state.repeatMode !== "one");
+  const labels = { off: "Repeat Off", all: "Repeat All", one: "Repeat One (Replay)" };
+  repeatBtn.setAttribute("aria-label", labels[state.repeatMode]);
+  showToast(labels[state.repeatMode]);
+});
+
+audioPlayer.addEventListener("playing", () => clearTimeout(state.radioStallTimer));
+audioPlayer.addEventListener("timeupdate", () => {
+  if (state.activeEngine !== "audio" || getCurrentTrack()?.isRadio) return;
+  updateActiveLyric(audioPlayer.currentTime);
+  if (!audioPlayer.duration || !isFinite(audioPlayer.duration)) return;
+  updateProgressVisual(audioPlayer.currentTime / audioPlayer.duration);
+  syncTimeReadouts(audioPlayer.currentTime, audioPlayer.duration, false);
+});
+audioPlayer.addEventListener("ended", handleTrackEnded);
+audioPlayer.addEventListener("error", () => {
+  const cur = getCurrentTrack();
+  if (cur?.isRadio && state.isPlaying) handleRadioFailure(cur, false);
+});
+
+function formatTime(sec) { const m = Math.floor(sec / 60), s = Math.floor(sec % 60); return `${m}:${s < 10 ? "0" : ""}${s}`; }
+
+function syncTrayDetails() {
+  const track = getCurrentTrack();
+  if (!track) return;
+  trayArt.src = track.artwork;
+  document.getElementById("tray-title").textContent = track.title;
+  document.getElementById("tray-artist").textContent = `${track.artist} • ${track.album}`;
+  document.getElementById("tray-region-badge").textContent = track.isRadio ? (COUNTRY_NAMES[track.country] || "LIVE FM") : track.region === "uganda" ? "UGANDA" : "GLOBAL";
+  document.getElementById("tray-year-badge").textContent = track.duration && !track.isRadio ? formatTime(track.duration) : track.releaseYear;
+  document.getElementById("tray-genre-badge").textContent = track.genre;
+  const ytmUrl = track.ytVideoId ? `https://music.youtube.com/watch?v=${track.ytVideoId}` : `https://music.youtube.com/search?q=${encodeURIComponent(`${track.title} ${track.artist}`)}`;
+  document.getElementById("tray-ytm-link").href = ytmUrl;
+  const likeBtn = document.getElementById("tray-like-btn");
+  const isLiked = Boolean(state.likedMap[track.id]);
+  likeBtn.textContent = isLiked ? "♥" : "♡"; likeBtn.classList.toggle("liked", isLiked);
+  likeBtn.onclick = () => toggleLike(track);
+  document.getElementById("tray-share-btn").onclick = async () => {
+    const txt = `Listening to ${track.title} (${track.artist}) on MuzikiGlass`;
+    if (navigator.share) navigator.share({ title: track.title, text: txt, url: ytmUrl }).catch(() => {});
+    else if (navigator.clipboard) { await navigator.clipboard.writeText(`${txt} ${ytmUrl}`); showToast("Link copied"); }
+  };
+}
+
+function renderTrayQueue() {
+  const listEl = document.getElementById("tray-queue-list");
+  document.getElementById("picker-count").textContent = `${state.activeQueue.length} items`;
+  listEl.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  state.activeQueue.slice(0, 75).forEach((track) => {
+    const row = document.createElement("div");
+    row.className = `queue-item${track.id === state.currentTrackId ? " active" : ""}`;
+    row.dataset.trackId = track.id;
+    row.innerHTML = `<img src="${track.artwork}" alt="${track.title}" loading="lazy" /><div class="queue-meta"><strong>${track
