@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MuzikiGlass — Ugandan & Global Audio + Live FM</title>
-  <link rel="stylesheet" href="styles.css?v=16" />
+  <link rel="stylesheet" href="styles.css?v=15" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
@@ -63,9 +63,10 @@
     </div>
   </header>
 
+  <!-- Clean Content Workspace (Search dynamically promotes Songs to the very top) -->
   <main class="app-shell" id="app-shell">
     <!-- Section 1: Country-Categorized FM Radio -->
-    <section class="content-section sheet-panel glass-tile" id="radio-section">
+    <section class="content-section sheet-panel liquid-glass-surface" id="radio-section">
       <div class="section-head">
         <div>
           <h2 class="section-title" id="radio-heading">Live FM • 🇺🇬 Uganda</h2>
@@ -87,7 +88,7 @@
     </section>
 
     <!-- Section 2: Trending / Search Songs -->
-    <section class="content-section sheet-panel glass-tile" id="tracks-section">
+    <section class="content-section sheet-panel liquid-glass-surface" id="tracks-section">
       <div class="section-head">
         <div>
           <h2 class="section-title" id="grid-heading">Trending Charts</h2>
@@ -107,10 +108,12 @@
     </section>
   </main>
 
+  <!-- Scrim behind expanded player -->
   <div class="player-scrim" id="player-scrim" aria-hidden="true"></div>
 
-  <!-- ONE Unified Morphing Liquid Glass Player -->
+  <!-- ONE Unified Morphing Liquid Glass Player (Minimized Pill <-> Expanded Sheet) -->
   <section class="unified-player liquid-glass-surface" id="unified-player" aria-label="Music Player">
+    <!-- MINIMIZED BAR VIEW -->
     <div class="player-mini-view" id="player-mini-view">
       <div class="dock-art-morph" id="dock-art-wrap">
         <img id="dock-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f2f2f7'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fa243c' font-size='26'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" alt="Now Playing" />
@@ -140,6 +143,7 @@
       </div>
     </div>
 
+    <!-- EXPANDED SHEET VIEW (Same Liquid Glass Container!) -->
     <div class="player-expanded-view" id="player-expanded-view">
       <header class="tray-top" id="tray-drag-bar">
         <div class="tray-slide-pills liquid-glass-surface" id="tray-segmented" role="tablist">
@@ -158,7 +162,9 @@
 
       <div class="tray-carousel" id="tray-carousel">
         <div class="tray-slide" id="slide-player">
-          <div class="tray-media-box"><img id="tray-art" src="" alt="Album Cover" /></div>
+          <div class="tray-media-box">
+            <img id="tray-art" src="" alt="Album Cover" />
+          </div>
           <div class="tray-song-info">
             <div class="tray-title-row">
               <div class="tray-title-text"><h2 id="tray-title">Select a Track</h2><p id="tray-artist">Uganda &amp; Global Music</p></div>
@@ -223,7 +229,7 @@
     </div>
   </section>
 
-  <!-- API Key Settings Modal -->
+  <!-- YouTube API Key Settings Modal -->
   <div class="modal-backdrop" id="yt-modal-backdrop" aria-hidden="true">
     <div class="yt-modal liquid-glass-surface" role="dialog" aria-modal="true" aria-label="YouTube API Key Settings">
       <div class="tray-header-row"><span class="m3-badge">▶ API KEY SETTINGS</span><button id="yt-modal-close" class="icon-close-btn">✕</button></div>
@@ -236,11 +242,11 @@
 
   <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
 
-  <!-- Unoccluded 200x200 Background Audio-Only YouTube Engine -->
+  <!-- Persistent 200x200 Background Audio-Only YouTube Engine -->
   <div id="yt-bg-audio-host" class="yt-bg-audio-host" aria-hidden="true"><div id="yt-player-mount"></div></div>
   <audio id="audio-player" preload="none"></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>
