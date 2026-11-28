@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MuzikiGlass — iOS Liquid Glass + Ugandan & Global Music</title>
-  <link rel="stylesheet" href="styles.css?v=13" />
+  <link rel="stylesheet" href="styles.css?v=14" />
 </head>
 <body>
   <div class="ambient-canvas" aria-hidden="true"></div>
@@ -22,7 +22,7 @@
 
       <form id="search-form" class="search-capsule">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-        <input id="search-input" type="search" placeholder="Search Ugandan FM, artists, or trending hits..." autocomplete="off" />
+        <input id="search-input" type="search" placeholder="Search any song, artist, or Ugandan FM..." autocomplete="off" />
         <button type="submit" class="btn-expressive">Search</button>
       </form>
 
@@ -66,18 +66,18 @@
     <section class="hero-sheet">
       <div class="hero-content">
         <div class="hero-top-row">
-          <div class="live-badge"><span class="pulse-dot"></span><span id="live-status-text">KAMPALA TO THE WORLD • TRENDING CHARTS</span></div>
+          <div class="live-badge"><span class="pulse-dot"></span><span id="live-status-text">KAMPALA TO THE WORLD • AUDIO STREAM</span></div>
           <div class="expressive-tokens-hud"><span class="token-label">M3 EXPRESSIVE</span><span class="token-dot t-primary"></span><span class="token-dot t-secondary"></span></div>
         </div>
         <h1 class="hero-headline">Feel the <span class="accent-headline">Liquid Sound</span><br />of Uganda &amp; Global Radio.</h1>
-        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>100+ official trending tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
+        <p class="hero-copy">Stream <strong>60+ Ugandan FM stations</strong> grouped by country alongside <strong>100+ full-length trending tracks</strong>, synced LRC lyrics, and adaptive iOS Liquid Glass.</p>
       </div>
 
       <aside class="spotlight-card" id="spotlight-card">
         <div class="spotlight-header"><span class="m3-badge">★ FEATURED</span><span class="m3-badge tonal" id="spotlight-region">UGANDA</span></div>
         <div class="spotlight-art-wrap"><img id="spotlight-img" src="" alt="Featured Track" /></div>
         <div class="spotlight-meta"><h2 id="spotlight-title">Loading...</h2><p id="spotlight-artist">Syncing tracks</p></div>
-        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Now</button>
+        <button id="spotlight-play-btn" class="morph-play-btn">▶ Play Audio</button>
       </aside>
     </section>
 
@@ -103,7 +103,7 @@
     <!-- Trending Tracks -->
     <section class="content-section sheet-panel" id="tracks-section">
       <div class="section-head">
-        <div><h2 class="section-title" id="grid-heading">Trending Charts</h2><p class="section-sub">Official Ugandan &amp; Global hits</p></div>
+        <div><h2 class="section-title" id="grid-heading">Trending Charts</h2><p class="section-sub">Official Ugandan &amp; Global audio hits</p></div>
         <div class="section-tools">
           <select id="sort-select" class="glass-select" aria-label="Sort Tracks">
             <option value="rank">Chart Rank</option>
@@ -167,7 +167,6 @@
         <div class="tray-slide" id="slide-player">
           <div class="tray-media-box">
             <img id="tray-art" src="" alt="Album Cover" />
-            <div id="yt-player-wrap" class="yt-player-wrap yt-inactive"><div id="yt-player-mount"></div></div>
           </div>
           <div class="tray-song-info">
             <div class="tray-title-row">
@@ -178,7 +177,7 @@
                 <button id="tray-share-btn" class="fav-btn" title="Share">⤴</button>
               </div>
             </div>
-            <div class="tray-meta-badges"><span class="m3-badge tonal" id="tray-region-badge">GLOBAL</span><span class="m3-badge tonal" id="tray-year-badge">2025</span><span class="m3-badge tonal" id="tray-genre-badge">Music</span></div>
+            <div class="tray-meta-badges"><span class="m3-badge tonal" id="tray-region-badge">GLOBAL</span><span class="m3-badge tonal" id="tray-year-badge">2025</span><span class="m3-badge tonal" id="tray-genre-badge">Audio</span></div>
           </div>
 
           <div class="tray-bottom-controls">
@@ -237,7 +236,7 @@
   <div class="tray-backdrop" id="yt-modal-backdrop" aria-hidden="true">
     <div class="yt-modal liquid-glass-surface" role="dialog" aria-modal="true" aria-label="YouTube API Key Settings">
       <div class="tray-header-row"><span class="m3-badge">▶ API KEY SETTINGS</span><button id="yt-modal-close" class="icon-close-btn">✕</button></div>
-      <p class="modal-desc">Paste a <strong>YouTube Data API v3</strong> key to override the default key and load live trending charts. Stored in your browser (<code>localStorage.yt_api_key</code>).</p>
+      <p class="modal-desc">Your <strong>YouTube Data API v3</strong> key powers search &amp; trending charts (audio-only mode). Stored in <code>localStorage.yt_api_key</code>.</p>
       <input id="yt-api-key-input" class="modal-input" type="password" placeholder="Paste YouTube Data API v3 Key (AIza...)" />
       <p id="yt-test-status" class="modal-status"></p>
       <div class="modal-actions"><button id="yt-save-btn" class="btn-expressive">Test &amp; Save Key</button><button id="yt-clear-btn" class="pill-btn">Reset Default</button></div>
@@ -245,8 +244,12 @@
   </div>
 
   <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
+
+  <!-- Persistent 200x200 Background Audio-Only YouTube Engine (Never unmounted, hidden cleanly behind .ambient-canvas) -->
+  <div id="yt-bg-audio-host" class="yt-bg-audio-host" aria-hidden="true"><div id="yt-player-mount"></div></div>
   <audio id="audio-player" preload="none"></audio>
+
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
